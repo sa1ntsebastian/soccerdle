@@ -719,6 +719,8 @@ $('#dlg-help').innerHTML = '<h2>Klassik</h2>' + HT.page('Errate den gesuchten Sp
 $('#btn-help').addEventListener('click', () => { const g = window.currentGame; if (g && g !== 'classic' && typeof GAMES !== 'undefined' && GAMES[g] && GAMES[g].helpHtml) showModeHelp(g); else $('#dlg-help').showModal(); });
 $('#btn-stats').addEventListener('click', showStats);
 $('#btn-theme').addEventListener('click', toggleTheme);
+// Design umschalten: Pixel-Arcade <-> Sticker-Album (gemerkt in localStorage, siehe skin-sticker.css)
+$('#btn-skin').addEventListener('click', () => { const r = document.documentElement; r.dataset.skin = r.dataset.skin === 'sticker' ? 'pixel' : 'sticker'; try { localStorage.setItem('soccerdle-skin', r.dataset.skin); } catch { /* egal */ } });
 
 /* ---------- Start ---------- */
 paintThemeIcon();

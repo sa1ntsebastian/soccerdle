@@ -60,6 +60,9 @@ button { cursor: pointer; }
 a { color: var(--brand); }
 .dir, .ico-lock { image-rendering: pixelated; }
 
+/* Albumblatt-Rahmen: nur im Sticker-Design sichtbar (skin-sticker.css) */
+.sheet { display: contents; }
+
 /* ===================== Kopfbereich ===================== */
 .hero { position: relative; background: var(--header); color: #fff; padding: 12px 16px 14px; margin-bottom: 40px; }
 .hero::after { content: ""; position: absolute; left: 0; right: 0; bottom: -16px; height: 16px;
