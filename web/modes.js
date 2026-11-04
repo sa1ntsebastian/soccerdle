@@ -660,3 +660,13 @@ document.addEventListener('DOMContentLoaded', () => {
   if (g && (g === 'classic' || GAMES[g])) showGame(g);
   updateDoneDots();
 });
+
+/* Tippen ohne vorher ins Suchfeld zu klicken: eine Buchstabentaste fokussiert das sichtbare Suchfeld */
+document.addEventListener('keydown', e => {
+  if (e.ctrlKey || e.metaKey || e.altKey || e.key.length !== 1) return;
+  const a = document.activeElement;
+  if (a && (/^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName) || a.isContentEditable)) return;
+  if (document.querySelector('dialog[open]')) return;
+  const inp = [...document.querySelectorAll('#search, .mode-search')].find(i => !i.disabled && i.offsetParent !== null);
+  if (inp) inp.focus();
+});
