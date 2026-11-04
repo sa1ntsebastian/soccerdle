@@ -117,60 +117,95 @@ const HT = {
 const HT_ELF = [[75, 28], [28, 62], [75, 66], [122, 62], [52, 108], [98, 108], [22, 140], [58, 150], [92, 150], [128, 140], [75, 174]];
 const htElf = (hi = -1, text = '?') => HT.pitch(HT_ELF.map(([x, y], i) => [x, y, i === hi ? text : '', i === hi ? 'q' : '']));
 
-/* ---------- Teilen: Ergebnis-Bild (Canvas, Pixel-Optik) + Teilen-Dialog des Smartphones ---------- */
+/* ---------- Teilen: Ergebnis-Bild (Canvas, Sticker-Album-Optik) + Teilen-Dialog des Smartphones ---------- */
 // card = { mode, big, sub, grid?: [['hit','near',...], ...], lines?: ['🟩⬛⬛', ...], pitch?: { slots: [{x, y, name, rating}], caption } }
 function drawShareCard(card) {
-  const W = 1080, H = card.pitch ? 1500 : 1080;
+  const W = 1080, TILE = 84, GAP = 22;
+  const rows = card.grid ? card.grid.slice(0, 8) : [];
+  const nLines = card.lines ? Math.min(card.lines.length, 8) : 0;
+  const top = card.pitch ? 580 : 600, PH = 800;
+  const contentH = card.pitch ? PH + 70 : rows.length * (TILE + GAP) + (card.grid && card.grid.length > rows.length ? 60 : 0) + nLines * 86 + 20;
+  const H = Math.max(1080, top + contentH + 150);
   const c = document.createElement('canvas'); c.width = W; c.height = H;
   const g = c.getContext('2d');
-  g.imageSmoothingEnabled = false;
-  const FONT = "'Digits', 'Pixelify Sans', 'Courier New', monospace", BODY = "'Tiny5', 'Courier New', monospace";
-  const COL = { hit: '#1d8a43', near: '#ffd33d', miss: '#cf2f2f', unknown: '#7a8290' }, INK = '#14172b';
-  // Pixel-Kasten mit Treppen-Ecken (Umriss ohne Eckpixel)
-  const box = (x, y, w, h, fill, line = INK, t = 6) => { g.fillStyle = line; g.fillRect(x - t, y, w + 2 * t, h); g.fillRect(x, y - t, w, h + 2 * t); g.fillStyle = fill; g.fillRect(x, y, w, h); };
-  // Text mit Pixel-Kontur
-  const outlined = (txt, x, y, fill, o = 5) => { g.fillStyle = '#0b0f1c'; for (const [dx, dy] of [[-o, 0], [o, 0], [0, -o], [0, o], [-o, -o], [o, -o], [-o, o], [o, o]]) g.fillText(txt, x + dx, y + dy); g.fillStyle = fill; g.fillText(txt, x, y); };
-  // Hintergrund: Pixel-Rasen mit Streifen und Büscheln
-  g.fillStyle = '#3f9b4a'; g.fillRect(0, 0, W, H);
-  g.fillStyle = '#378f43'; for (let y = 0; y < H; y += 128) g.fillRect(0, y, W, 64);
-  g.fillStyle = '#2f7d3a'; for (let y = 16; y < H; y += 48) for (let x = (y / 48 % 2) * 24 + 8; x < W; x += 96) g.fillRect(x, y, 8, 8);
-  g.textAlign = 'center'; g.textBaseline = 'alphabetic';
-  // Kopfleiste mit Zielflaggen-Schachbrett
-  g.fillStyle = '#123524'; g.fillRect(0, 0, W, 190);
-  for (let x = 0; x < W; x += 32) for (let r = 0; r < 2; r++) { g.fillStyle = (x / 32 + r) % 2 ? INK : '#ffd33d'; g.fillRect(x, 190 + r * 16, 32, 16); }
-  g.font = `400 64px 'Press Start 2P', ${FONT}`;   // Logo-Schrift (in Pixelify wirkt das C wie ein O)
-  const w1 = g.measureText('SOCCER').width, w2 = g.measureText('DLE').width, x0 = (W - w1 - w2) / 2;
-  g.textAlign = 'left'; outlined('SOCCER', x0, 116, '#ffd33d', 5); outlined('DLE', x0 + w1, 116, '#fff', 5); g.textAlign = 'center';
-  g.fillStyle = '#ffd33d'; g.font = `500 40px ${BODY}`; g.fillText(card.mode.toUpperCase(), W / 2, 162);
-  // großes Ergebnis
+  const IMP = n => `italic 400 ${n}px Impact, 'Arial Black', sans-serif`, BAR = n => `700 ${n}px 'Barlow Condensed', 'Arial Narrow', sans-serif`;
+  const INK = '#111', BLUE = '#1f4fd8', RED = '#e4002b', YEL = '#ffd21f';
+  const COL = { hit: '#00a651', near: YEL, miss: RED, unknown: '#8a93a6' };
+  const rr = (x, y, w, h, r) => { g.beginPath(); g.moveTo(x + r, y); g.arcTo(x + w, y, x + w, y + h, r); g.arcTo(x + w, y + h, x, y + h, r); g.arcTo(x, y + h, x, y, r); g.arcTo(x, y, x + w, y, r); g.closePath(); };
+  // Sticker: harter Schatten, Fläche, dicke Kontur
+  const sticker = (x, y, w, h, r, fill, lw = 6, sh = 6) => {
+    g.fillStyle = INK; rr(x + sh, y + sh, w, h, r); g.fill();
+    g.fillStyle = fill; rr(x, y, w, h, r); g.fill();
+    g.lineWidth = lw; g.strokeStyle = INK; rr(x, y, w, h, r); g.stroke();
+  };
+  // Text mit dicker dunkler Kontur und hartem Schatten
+  const title = (t, x, y, fill, lw = 14, sh = 8) => {
+    g.lineJoin = 'round'; g.lineWidth = lw; g.strokeStyle = INK; g.fillStyle = INK;
+    g.strokeText(t, x + sh, y + sh); g.fillText(t, x + sh, y + sh);
+    g.strokeText(t, x, y); g.fillStyle = fill; g.fillText(t, x, y);
+  };
+  g.textBaseline = 'alphabetic';
+  // Hintergrund: gelb mit Schrägstreifen
+  g.fillStyle = YEL; g.fillRect(0, 0, W, H);
+  g.fillStyle = '#ffdf55';
+  for (let i = -H; i < W + H; i += 120) { g.beginPath(); g.moveTo(i, 0); g.lineTo(i + 60, 0); g.lineTo(i + 60 - H, H); g.lineTo(i - H, H); g.closePath(); g.fill(); }
+  // Album-Seite
+  const sx = 40, sy = 40, sw = W - 80, sh = H - 80;
+  sticker(sx, sy, sw, sh, 40, '#fff', 10, 16);
+  g.save(); rr(sx, sy, sw, sh, 40); g.clip(); g.fillStyle = RED;
+  for (const [cx, cy, dx, dy] of [[sx, sy, 1, 1], [sx + sw, sy, -1, 1], [sx, sy + sh, 1, -1], [sx + sw, sy + sh, -1, -1]]) { g.beginPath(); g.moveTo(cx, cy); g.lineTo(cx + dx * 110, cy); g.lineTo(cx, cy + dy * 110); g.closePath(); g.fill(); }
+  g.restore();
+  g.lineWidth = 10; g.strokeStyle = INK; rr(sx, sy, sw, sh, 40); g.stroke();
+  // Logo: S + Ball + CCER + DLE
+  const fs = 140; g.font = IMP(fs); g.textAlign = 'left';
+  const D = 104, wS = g.measureText('S').width, wC = g.measureText('CCER').width, wD = g.measureText('DLE').width, total = wS + D + 6 + wC + wD, lx = (W - total) / 2, ly = 215;
+  title('S', lx, ly, BLUE); title('CCER', lx + wS + D + 6, ly, BLUE); title('DLE', lx + wS + D + 6 + wC, ly, RED);
+  g.save(); g.translate(lx + wS + 3, ly - D + 4); g.scale(D / 80, D / 80); g.lineJoin = 'round';
+  g.fillStyle = INK; g.beginPath(); g.arc(46, 46, 37, 0, 7); g.fill();            // Schatten
+  g.fillStyle = '#fff'; g.strokeStyle = INK; g.lineWidth = 4; g.beginPath(); g.arc(40, 40, 37, 0, 7); g.fill(); g.stroke();
+  g.fillStyle = BLUE; g.lineWidth = 3.5; const pent = new Path2D('m40 17 16 11.7-6.1 18.8H30.1L24 28.7z'); g.fill(pent); g.stroke(pent);
+  g.stroke(new Path2D('M40 17V4M56 28.7l14-4.6M49.9 47.5l8.6 11.8M30.1 47.5l-8.6 11.8M24 28.7l-14-4.6'));
+  g.restore();
+  g.setLineDash([18, 12]); g.lineWidth = 5; g.strokeStyle = INK; g.beginPath(); g.moveTo(sx + 30, 258); g.lineTo(sx + sw - 30, 258); g.stroke(); g.setLineDash([]);
+  g.textAlign = 'center';
+  // Modus + großes Ergebnis
+  g.font = BAR(46); g.fillStyle = BLUE; try { g.letterSpacing = '4px'; } catch { /* egal */ }
+  g.fillText(card.mode.toUpperCase(), W / 2, 322); try { g.letterSpacing = '0px'; } catch { /* egal */ }
   let bigSize = card.pitch ? 150 : 170;
-  g.font = `700 ${bigSize}px ${FONT}`;
-  while (g.measureText(card.big).width > W - 160 && bigSize > 60) { bigSize -= 8; g.font = `700 ${bigSize}px ${FONT}`; }
-  outlined(card.big, W / 2, card.pitch ? 380 : 440, '#fff', 8);
-  g.font = `500 44px ${BODY}`; if (card.sub) outlined(card.sub, W / 2, card.pitch ? 446 : 510, '#f6ecd2', 3);
-  let y = card.pitch ? 500 : 570;
+  g.font = IMP(bigSize);
+  while (g.measureText(card.big).width > W - 240 && bigSize > 60) { bigSize -= 8; g.font = IMP(bigSize); }
+  title(card.big, W / 2, card.pitch ? 470 : 500, RED, 14, 8);
+  if (card.sub) { g.font = BAR(52); g.fillStyle = INK; g.fillText(card.sub, W / 2, card.pitch ? 530 : 566); }
+  let y = top;
   if (card.grid) {          // Kacheln wie im Spiel
-    const rows = card.grid.slice(0, 8), n = rows[0] ? rows[0].length : 7, s = 84, gap = 22, w0 = n * s + (n - 1) * gap, x0g = (W - w0) / 2;
-    rows.forEach((r, i) => r.forEach((st, k) => box(x0g + k * (s + gap), y + i * (s + gap), s, s, COL[st] || COL.unknown, INK, 6)));
-    y += rows.length * (s + gap);
-    if (card.grid.length > rows.length) { g.font = `500 36px ${BODY}`; outlined(`+ ${card.grid.length - rows.length} weitere`, W / 2, y + 40, '#fff', 3); }
+    const n = rows[0] ? rows[0].length : 7, w0 = n * TILE + (n - 1) * GAP, x0g = (W - w0) / 2;
+    rows.forEach((r, i) => r.forEach((st, k) => sticker(x0g + k * (TILE + GAP), y + i * (TILE + GAP), TILE, TILE, 18, COL[st] || COL.unknown, 6, 6)));
+    y += rows.length * (TILE + GAP);
+    if (card.grid.length > rows.length) { g.font = BAR(40); g.fillStyle = INK; g.fillText(`+ ${card.grid.length - rows.length} weitere`, W / 2, y + 36); y += 60; }
   }
-  if (card.lines) { g.font = `500 64px ${BODY}`; card.lines.slice(0, 8).forEach((l, i) => { g.fillStyle = '#fff'; g.fillText(l, W / 2, y + 70 + i * 86); }); }
-  if (card.pitch) {         // Elf als Namensschilder mit Rating auf dem Rasen
-    const px = 130, py = y, pw = W - 260, ph = 880;
-    g.fillStyle = '#2f8f3c'; g.fillRect(px, py, pw, ph); g.fillStyle = '#44a853'; for (let yy = 0; yy < ph; yy += 160) g.fillRect(px, py + yy, pw, 80);
-    g.fillStyle = INK; for (const [rx, ry, rw, rh] of [[px - 8, py - 8, pw + 16, 8], [px - 8, py + ph, pw + 16, 8], [px - 8, py - 8, 8, ph + 16], [px + pw, py - 8, 8, ph + 16]]) g.fillRect(rx, ry, rw, rh);
-    g.fillStyle = '#f4f4f4'; g.fillRect(px + 16, py + 16, pw - 32, 6); g.fillRect(px + 16, py + ph - 22, pw - 32, 6); g.fillRect(px + 16, py + 16, 6, ph - 32); g.fillRect(px + pw - 22, py + 16, 6, ph - 32); g.fillRect(px + 16, py + ph / 2 - 3, pw - 32, 6);
-    g.fillRect(px + pw / 2 - 90, py + ph / 2 - 90, 180, 6); g.fillRect(px + pw / 2 - 90, py + ph / 2 + 84, 180, 6); g.fillRect(px + pw / 2 - 90, py + ph / 2 - 90, 6, 180); g.fillRect(px + pw / 2 + 84, py + ph / 2 - 90, 6, 180);
+  if (card.lines) { g.font = `500 64px 'Segoe UI Emoji','Apple Color Emoji','Noto Color Emoji', sans-serif`; g.fillStyle = INK; card.lines.slice(0, 8).forEach((l, i) => g.fillText(l, W / 2, y + 70 + i * 86)); }
+  if (card.pitch) {         // Elf als Sticker-Karten mit Rating auf dem Rasen
+    const px = 110, py = y, pw = W - 220, ph = PH;
+    g.fillStyle = INK; rr(px + 10, py + 10, pw, ph, 28); g.fill();
+    g.save(); rr(px, py, pw, ph, 28); g.clip();
+    g.fillStyle = '#22b05a'; g.fillRect(px, py, pw, ph); g.fillStyle = '#1b9a4d'; for (let yy = 0; yy < ph; yy += 160) g.fillRect(px, py + yy, pw, 80);
+    g.restore();
+    g.lineWidth = 10; g.strokeStyle = INK; rr(px, py, pw, ph, 28); g.stroke();
+    g.lineWidth = 6; g.strokeStyle = 'rgba(255,255,255,.9)';
+    g.strokeRect(px + 24, py + 24, pw - 48, ph - 48);
+    g.beginPath(); g.moveTo(px + 24, py + ph / 2); g.lineTo(px + pw - 24, py + ph / 2); g.stroke();
+    g.beginPath(); g.arc(px + pw / 2, py + ph / 2, 90, 0, 7); g.stroke();
     for (const s of card.pitch.slots) {
-      const cx = px + pw * s.x / 100, cy = py + ph * s.y / 100 + 6;
-      box(cx - 70, cy - 40, 140, 80, '#101426', '#fff', 4);
-      g.font = `700 36px ${FONT}`; g.fillStyle = '#ffd33d'; g.fillText(String(s.rating), cx, cy - 2);
-      g.font = `500 26px ${BODY}`; g.fillStyle = '#fff'; g.fillText(s.name.length > 11 ? s.name.slice(0, 10) + '…' : s.name, cx, cy + 28);
+      const cx = px + pw * s.x / 100, cy = py + ph * s.y / 100, w = 156, h = 100;
+      sticker(cx - w / 2, cy - h / 2, w, h, 14, '#fff', 5, 5);
+      g.save(); rr(cx - w / 2, cy - h / 2, w, 44, 14); g.clip(); g.fillStyle = BLUE; g.fillRect(cx - w / 2, cy - h / 2, w, 44); g.restore();
+      g.font = IMP(40); g.fillStyle = '#fff'; g.fillText(String(s.rating), cx, cy - h / 2 + 36);
+      let nf = 32; g.font = BAR(nf); while (g.measureText(s.name).width > w - 14 && nf > 18) { nf -= 2; g.font = BAR(nf); }
+      g.fillStyle = INK; g.fillText(s.name, cx, cy + 34);
     }
-    if (card.pitch.caption) { g.font = `500 34px ${BODY}`; outlined(card.pitch.caption, W / 2, py + ph + 64, '#fff', 3); }
+    if (card.pitch.caption) { g.font = BAR(40); g.fillStyle = INK; g.fillText(card.pitch.caption, W / 2, py + ph + 62); }
   }
-  g.font = `500 38px ${BODY}`; outlined(CONFIG.siteUrl.replace(/^https?:\/\//, ''), W / 2, H - 44, '#ffd33d', 3);
+  g.font = BAR(44); g.fillStyle = BLUE; g.fillText(CONFIG.siteUrl.replace(/^https?:\/\//, ''), W / 2, H - 78);
   return c;
 }
 
@@ -179,7 +214,7 @@ async function shareResult(text, card, btn) {
   const full = text + '\n' + CONFIG.siteUrl;
   const touch = matchMedia('(pointer: coarse)').matches;
   let file = null;
-  try { await document.fonts.load('20px Digits', '0123456789'); } catch { /* egal */ }
+  try { await document.fonts.load("700 20px 'Barlow Condensed'", 'Soccerdle'); } catch { /* egal */ }
   try {
     const blob = await new Promise(res => drawShareCard(card).toBlob(res, 'image/png'));
     file = new File([blob], 'soccerdle.png', { type: 'image/png' });
@@ -720,7 +755,6 @@ $('#btn-help').addEventListener('click', () => { const g = window.currentGame; i
 $('#btn-stats').addEventListener('click', showStats);
 $('#btn-theme').addEventListener('click', toggleTheme);
 // Design umschalten: Pixel-Arcade <-> Sticker-Album (gemerkt in localStorage, siehe skin-sticker.css)
-$('#btn-skin').addEventListener('click', () => { const r = document.documentElement; r.dataset.skin = r.dataset.skin === 'sticker' ? 'pixel' : 'sticker'; try { localStorage.setItem('soccerdle-skin', r.dataset.skin); } catch { /* egal */ } });
 
 /* ---------- Start ---------- */
 paintThemeIcon();

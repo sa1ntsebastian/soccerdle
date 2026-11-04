@@ -105,7 +105,7 @@ function createSearch(host, { placeholder = 'Spielername eingeben …', onPick, 
     }).join('') : '<li class="empty">Kein Spieler gefunden</li>';
     list.hidden = false;
   };
-  const pick = id => { if (!id) return; input.value = ''; list.hidden = true; onPick(id); input.focus(); };
+  const pick = id => { if (!id) return; input.value = ''; list.hidden = true; window.__refocusSearch = true; onPick(id); input.focus(); };
   input.addEventListener('input', update);
   input.addEventListener('keydown', e => {
     const items = [...list.querySelectorAll('li[data-id]')];
@@ -154,6 +154,7 @@ function makeMode(key, impl) {
     render() {
       if (!this.puzzle) { this.root.innerHTML = `<section class="card play"><p>Für diesen Modus fehlen die Daten (data/history.js / data/lineups.js).</p></section>`; return; }
       impl.render.call(this);
+      if (window.__refocusSearch) { window.__refocusSearch = false; const i = this.root.querySelector('.mode-search'); if (i && !i.disabled) i.focus(); }  // Suchfeld wird beim Rendern neu erzeugt: Fokus behalten
     },
     header(title, sub) {
       const testBtn = CONFIG.testMode ? `<button class="btn test-btn" data-act="test">↻ Neues Rätsel (Test)</button>` : '';
