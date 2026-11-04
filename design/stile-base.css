@@ -1,0 +1,103 @@
+/* Struktur für alle Stil-Entwürfe (Layout ohne Farben/Dekor). Jeder Stil legt seine Optik darüber. */
+@font-face { font-family: "Barlow Condensed"; font-weight: 700; src: url(../web/fonts/barlow-condensed-700-latin.woff2) format("woff2"); }
+@font-face { font-family: "Inter"; font-weight: 100 900; src: url(../web/fonts/inter-var-latin.woff2) format("woff2"); }
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body { margin: 0; min-height: 100vh; }
+button, input { font: inherit; color: inherit; }
+button { cursor: pointer; }
+svg { display: block; }
+.app { max-width: 1040px; margin: 0 auto; padding: 0 16px 40px; }
+.top { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 18px 0 14px; }
+.logo { display: flex; align-items: center; gap: 12px; text-decoration: none; color: inherit; }
+.logo-txt { display: flex; flex-direction: column; }
+.tools { display: flex; gap: 8px; }
+.tools button { width: 40px; height: 40px; display: grid; place-items: center; padding: 0; }
+.tools svg, .tabs svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.tabs { display: grid; grid-template-columns: repeat(6, 1fr); gap: 4px; margin-bottom: 14px; }
+.tabs button { display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 10px 4px; border: 0; background: none; }
+.tabs span { font-size: 12px; }
+main { display: flex; flex-direction: column; gap: 14px; }
+.col { display: flex; flex-direction: column; gap: 14px; min-width: 0; }
+.card { padding: 16px; }
+.subtabs { display: inline-flex; gap: 4px; margin-bottom: 12px; }
+.subtabs button { padding: 6px 14px; }
+.play-top { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; margin-bottom: 8px; }
+.yest { margin: 0 0 10px; font-size: 13px; }
+.search { display: flex; align-items: center; gap: 10px; padding: 0 14px; height: 48px; }
+.search svg { width: 20px; height: 20px; flex: none; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; }
+.search input { flex: 1; min-width: 0; border: 0; outline: 0; background: none; height: 100%; }
+.hints { display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 8px; margin-top: 12px; }
+.hint { padding: 10px; display: flex; flex-direction: column; gap: 4px; min-height: 58px; }
+.hint i { font-style: normal; font-size: 11px; text-transform: uppercase; letter-spacing: .06em; }
+.hint span { display: flex; align-items: center; gap: 5px; font-size: 13px; }
+.hint svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 2; }
+.g-head, .g-row { display: grid; grid-template-columns: minmax(120px, 1.5fr) 7.45fr; gap: 10px; align-items: center; }
+.g-head { grid-template-columns: minmax(120px, 1.5fr) 1.45fr repeat(6, 1fr); gap: 6px; margin-bottom: 6px; }
+.g-head em { font-style: normal; font-size: 11px; text-align: center; text-transform: uppercase; letter-spacing: .06em; }
+.g-row { padding: 6px 0; }
+.g-name { display: flex; flex-direction: column; min-width: 0; }
+.g-name b, .g-name small { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.tiles { display: grid; grid-template-columns: 1.45fr repeat(6, 1fr); gap: 6px; }   /* erste Spalte (Liga) breiter: lange Ligennamen */
+.t { display: grid; place-items: center; min-height: 52px; padding: 4px; text-align: center; font-size: 13px; font-weight: 700; }
+.flag { width: 24px; height: 17px; object-fit: cover; border-radius: 2px; }
+.legend { display: flex; gap: 14px; justify-content: center; margin-top: 12px; font-size: 12px; }
+.legend i { display: inline-block; width: 11px; height: 11px; margin-right: 6px; vertical-align: -1px; }
+.d-grid { display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr); gap: 16px; align-items: start; }
+.d-score { display: flex; align-items: baseline; justify-content: center; gap: 10px; margin-bottom: 10px; }
+.pitch { position: relative; aspect-ratio: 68 / 88; overflow: hidden; }
+.slot { position: absolute; translate: -50% -50%; width: 84px; min-height: 58px; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 4px; z-index: 1; }
+.slot.empty span { font-weight: 700; letter-spacing: .06em; }
+.slot .r { font-size: 20px; line-height: 1; }
+.slot .n { font-size: 12px; font-weight: 700; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.slot small { font-size: 10px; }
+.acts { position: absolute; right: -14px; top: 50%; translate: 0 -50%; display: flex; flex-direction: column; gap: 4px; }
+.acts i { width: 26px; height: 26px; border-radius: 50%; display: grid; place-items: center; font-style: normal; font-weight: 700; }
+.intro { margin: 0 0 12px; font-size: 14px; }
+.offers { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.offer { display: flex; flex-direction: column; align-items: center; gap: 3px; padding: 10px 6px; text-align: center; }
+.offer span { font-weight: 700; font-size: 14px; }
+.offer b { font-size: 20px; }
+.offer small { font-size: 12px; }
+.offer.gone { opacity: .4; }
+.squad { margin-top: 12px; display: flex; flex-direction: column; gap: 5px; }
+.pl { display: grid; grid-template-columns: 40px 26px 1fr 34px; gap: 8px; align-items: center; padding: 7px 9px; font-size: 14px; }
+.pl em { font-style: normal; font-size: 12px; font-weight: 700; }
+.pl b { text-align: right; font-size: 18px; }
+footer { margin-top: 26px; text-align: center; font-size: 12px; }
+@media (max-width: 760px) {
+  .d-grid { grid-template-columns: 1fr; }
+  .g-head { display: none; }
+  .g-row { grid-template-columns: 1fr; gap: 6px; }
+  .tabs span { font-size: 10.5px; }
+  .slot { width: 62px; min-height: 48px; padding: 3px; }
+  .slot .r { font-size: 16px; } .slot .n { font-size: 10.5px; }
+  .offer b { font-size: 16px; } .offer span { font-size: 12px; }
+}
+
+/* ---------- Desktop (ab ~1080 px): breiter Rahmen, zwei Spalten (Klassik links, Draft rechts) ---------- */
+@media (min-width: 1080px) {
+  .app { max-width: 1320px; padding: 0 28px 48px; }
+  .top { padding: 26px 0 16px; }
+  .tabs { max-width: 980px; }
+  main { display: grid; grid-template-columns: minmax(0, 1.12fr) minmax(0, 1fr); gap: 20px; align-items: start; }
+  main > .col { grid-column: 1; }
+  main > .draft { grid-column: 2; }
+  .draft .d-grid { grid-template-columns: 1fr; }
+  .draft .pitch { max-width: 560px; margin: 0 auto; }
+  .draft .d-field { order: 1; } .draft .d-side { order: 0; }
+  .card { padding: 22px; }
+}
+@media (min-width: 1500px) { .app { max-width: 1440px; } }
+
+/* Handy: Raster-Spalten dürfen schrumpfen (sonst sprengt der Inhalt die Seitenbreite) */
+@media (max-width: 760px) {
+  .tiles { grid-template-columns: minmax(0, 1.6fr) repeat(6, minmax(0, 1fr)); gap: 4px; }
+  .t { padding: 2px; min-height: 44px; overflow: hidden; }
+  .tabs { grid-template-columns: repeat(6, minmax(0, 1fr)); }
+  .d-grid { grid-template-columns: minmax(0, 1fr); }
+  .offers { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .hints { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .g-row { grid-template-columns: minmax(0, 1fr); }
+  .card { padding: 14px; }
+}

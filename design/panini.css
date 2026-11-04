@@ -1,0 +1,112 @@
+/* Panini-Sticker-Haut: ALLES ist ein aufgeklebter Sticker (weißer Stanzrand, Schnittlinie, farbiger Innenrahmen, weicher Schatten),
+   leere Hinweisfelder sind aufgedruckte Albumplätze mit Nummer, Spielerkarten sind Sammelbilder, Angebote sind Sticker-Tüten, Top-Spieler glänzen als Folie. */
+:root {
+  --heavy: "Barlow Condensed", "Arial Narrow", sans-serif;
+  --impact: Impact, "Arial Black", "Barlow Condensed", sans-serif;
+  --cut: #1a1a1a;
+  --holo: linear-gradient(115deg, #ffd21f 0%, #ff6a88 24%, #6c9bff 50%, #5ee7c0 76%, #ffd21f 100%);
+  --edge: #fff;
+}
+:root[data-theme="dark"] { --cut: #000; }
+body { color: var(--ink); font: 700 15px/1.45 "Inter", system-ui, sans-serif; background-color: var(--bg); background-image: var(--pattern); overflow-x: hidden; padding: 18px 0 8px; }
+.muted { color: var(--muted); font-weight: 600; }
+
+/* Gemeinsamer Sticker-Look (Kleinteile) */
+.tools button, .tabs button, .subtabs button, .search, .hint.open, .t, .pl, .offer, .slot.filled {
+  border: 4px solid var(--edge); box-shadow: 0 0 0 2px var(--cut), 0 5px 8px rgba(0,0,0,.28); }
+
+/* Albumblatt */
+.app { background-color: var(--paper); border: 5px solid var(--outline); border-radius: 24px; box-shadow: 8px 8px 0 var(--shadow); margin: 0 auto 40px; padding: 0 28px 40px; position: relative; max-width: calc(var(--maxw) - 40px);
+  background-image: radial-gradient(var(--dot) 1.6px, transparent 2px); background-size: 18px 18px; }
+.top { position: relative; overflow: hidden; margin: 24px 0 20px; padding: 14px 22px 22px; background: var(--paper); border: 6px solid var(--edge); border-radius: 20px; color: var(--ink);
+  box-shadow: inset 0 0 0 3px var(--c2), 0 0 0 2px var(--cut), 0 9px 16px rgba(0,0,0,.3); }
+.top::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 9px; background: var(--holo); }   /* Folienstreifen */
+.tools button { background: var(--c3); color: var(--on-c3); border-radius: 50%; }
+.tools button:active { translate: 1px 2px; }
+.logo { gap: 0; }
+
+/* Logo: Ball als O */
+.wm { font-family: var(--heavy); font-weight: 700; font-size: 58px; line-height: 1; letter-spacing: .03em; margin: 0; display: inline-flex; align-items: center; gap: .02em; color: var(--wm1); }
+.wm .w1, .wm .w2 { display: inline-block; transform: skewX(-9deg); text-shadow: 3px 3px 0 var(--wm-shadow); }
+.wm .w2 { color: var(--wm2); }
+.wm .w1:first-child { margin-right: -.05em; }
+  .wm .o-ball { width: .8em; height: .8em; margin: 0 .01em 0 0; filter: drop-shadow(3px 3px 0 var(--wm-shadow)); flex: none; }
+
+.tabs { margin-top: 0; gap: 8px; }
+.tabs button { background: var(--paper); color: var(--ink); border-radius: 14px; font-family: var(--heavy); text-transform: uppercase; letter-spacing: .04em; }
+.tabs span { font-size: 15px; }
+.tabs button.on { background: var(--c1); color: #fff; transform: rotate(-2deg) translateY(-2px); text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000; }
+.tabs button.on svg { filter: drop-shadow(1px 1px 0 #000); }
+
+/* Seiten-Rahmen: Sticker mit Innenrahmen und eingerollter Ecke */
+.card { background: var(--soft); border: 6px solid var(--edge); border-radius: 22px; position: relative;
+  box-shadow: inset 0 0 0 3px var(--c2); clip-path: polygon(0 0, 100% 0, 100% calc(100% - 42px), calc(100% - 42px) 100%, 0 100%); filter: drop-shadow(0 0 1.2px var(--cut)) drop-shadow(0 0 1.2px var(--cut)) drop-shadow(0 9px 10px rgba(0,0,0,.3)); }
+.card::after { content: ""; position: absolute; right: 0; bottom: 0; width: 42px; height: 42px; background: linear-gradient(135deg, #ecebe4 0 46%, rgba(0,0,0,.3) 50%, transparent 56%); pointer-events: none; }
+.subtabs button { background: var(--paper); color: var(--ink); border-radius: 999px; font-family: var(--heavy); text-transform: uppercase; letter-spacing: .04em; font-size: 14px; margin-right: 6px; }
+.subtabs .on { background: var(--outline); color: var(--paper); }
+.play-top b { font-family: var(--impact); font-size: 32px; text-transform: uppercase; font-style: italic; display: inline-block; color: var(--title-color); text-shadow: 3px 3px 0 var(--title-shadow); }
+.yest { color: var(--muted); } .yest b { background: var(--c3); padding: 1px 8px; border: 2px solid var(--cut); border-radius: 6px; color: var(--on-c3); }
+.search { background: var(--field-bg); border-radius: 999px; color: var(--muted); }
+
+/* Hinweise: gesperrt = aufgedruckter Albumplatz mit Nummer, offen = aufgeklebter Sticker */
+.hints { counter-reset: slot; }
+.hint { position: relative; counter-increment: slot; border: 3px dashed var(--muted); border-radius: 12px; background: transparent; color: var(--muted); }
+.hint:not(.open)::after { content: counter(slot); position: absolute; right: 10px; top: 2px; font: 700 34px var(--impact); color: var(--muted); opacity: .28; }
+.hint i { font-family: var(--heavy); color: var(--c2); letter-spacing: .05em; font-size: 13px; }
+.hint.open { border-radius: 12px; background: var(--c3); color: var(--on-c3); transform: rotate(-1deg); } .hint.open i { color: var(--c1-dark); }
+
+/* Tabelle */
+.g-head em { font-family: var(--heavy); font-size: 13px; color: var(--c2); letter-spacing: .06em; }
+.g-row { border-top: 3px dotted var(--muted); }
+.g-name b { font-family: var(--heavy); font-size: 19px; text-transform: uppercase; letter-spacing: .02em; color: var(--ink); } .g-name small { color: var(--muted); font-weight: 600; }
+.t { color: #fff; border-width: 3px; border-radius: 10px; font-family: var(--heavy); font-size: 16.5px; letter-spacing: 0; position: relative; box-shadow: 0 0 0 1.5px var(--cut), 0 4px 6px rgba(0,0,0,.28);
+  text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000, 2px 2px 0 rgba(0,0,0,.4); }
+.t:nth-child(odd) { transform: rotate(-1deg); } .t:nth-child(even) { transform: rotate(.8deg); }
+.t.hit { background: var(--ok); } .t.near { background: var(--warn); color: #1a1300; text-shadow: none; } .t.miss { background: var(--bad); }
+.flag { border: 2px solid #fff; box-shadow: 0 0 0 1px var(--cut); border-radius: 3px; width: 28px; height: 19px; }
+.g-row.win .g-name b { color: var(--ok); }
+.legend { color: var(--ink); } .legend i { border: 2px solid var(--edge); box-shadow: 0 0 0 1px var(--cut); border-radius: 3px; }
+.legend .hit { background: var(--ok); } .legend .near { background: var(--warn); } .legend .miss { background: var(--bad); }
+
+/* Draft */
+.d-score span { font-family: var(--heavy); letter-spacing: .08em; text-transform: uppercase; font-size: 15px; color: var(--c2); }
+.d-score b { font-family: var(--impact); font-size: 66px; font-style: italic; color: var(--c1); text-shadow: 4px 4px 0 var(--shadow); }
+.pitch { border: 6px solid var(--edge); border-radius: 20px; background: repeating-linear-gradient(0deg, var(--f1) 0 12.5%, var(--f2) 12.5% 25%); box-shadow: 0 0 0 2px var(--cut), 0 9px 14px rgba(0,0,0,.3); }
+.pitch::before { content: ""; position: absolute; inset: 10px; border: 4px solid #fff; border-radius: 6px; opacity: .92; }
+.pitch::after { content: ""; position: absolute; left: 50%; top: 50%; width: 26%; aspect-ratio: 1; translate: -50% -50%; border: 4px solid #fff; border-radius: 50%; opacity: .92; }
+/* Spieler-Sticker: Rating-Band oben, Position, Namensleiste unten; ab 90 als Folie */
+.slot.filled { width: 90px; min-height: 0; padding: 0; overflow: hidden; background: var(--sticker); color: var(--ink); border-radius: 10px; display: flex; flex-direction: column; transform: rotate(-1.5deg); }
+.slot.filled:nth-child(3n) { transform: rotate(2deg); } .slot.filled:nth-child(3n+1) { transform: rotate(-.4deg); }
+.slot .r { order: 1; width: 100%; margin: 0; padding: 3px 0 1px; background: var(--c2); color: #fff; font: 700 28px/1 var(--heavy); border: 0; text-shadow: 1px 1px 0 #000; }
+.slot small { order: 2; padding: 3px 0; font-size: 11px; font-weight: 800; color: var(--c1); }
+.slot .n { order: 3; width: 100%; padding: 4px 2px; background: var(--c1); color: #fff; font: 700 13px/1.05 var(--heavy); letter-spacing: .03em; text-transform: uppercase; text-shadow: 1px 1px 0 #000; }
+.slot.foil { border-color: #fff; box-shadow: 0 0 0 2px var(--cut), 0 0 16px 3px rgba(255,210,31,.75), 0 5px 8px rgba(0,0,0,.3); }
+.slot.foil .r { background: var(--holo); color: #111; text-shadow: none; }
+.slot.empty { border: 4px dashed #fff; color: #fff; border-radius: 12px; background: rgba(0,0,0,.22); font-family: var(--heavy); font-size: 20px; text-shadow: 2px 2px 0 rgba(0,0,0,.4); }
+.slot.pend { outline: 4px solid var(--c3); outline-offset: 2px; }
+.acts .ok { background: var(--ok); color: #fff; border: 3px solid #fff; box-shadow: 0 0 0 1.5px var(--cut); } .acts .undo { background: var(--paper); color: var(--ink); border: 3px solid #fff; box-shadow: 0 0 0 1.5px var(--cut); }
+.intro { color: var(--muted); font-weight: 600; } .intro b { color: var(--ink); }
+/* Angebote: Sticker-Tüten mit Folienkopf und Siegelnaht */
+.offer { position: relative; padding-top: 24px; border-radius: 12px; font-family: var(--heavy); color: var(--ink);
+  background: linear-gradient(var(--sticker), var(--sticker)) 0 16px / 100% calc(100% - 16px) no-repeat, var(--holo); }
+.offer::before { content: ""; position: absolute; left: 0; right: 0; top: 0; height: 16px; background: repeating-linear-gradient(90deg, rgba(0,0,0,.28) 0 2px, transparent 2px 7px); }
+.offer span { text-transform: uppercase; font-size: 15px; letter-spacing: .03em; } .offer b { font-size: 28px; color: var(--c2); font-style: italic; line-height: 1; } .offer small { font-family: "Inter", sans-serif; color: var(--muted); }
+.offer.on { transform: rotate(-2deg); background: linear-gradient(var(--c3), var(--c3)) 0 16px / 100% calc(100% - 16px) no-repeat, var(--holo); color: var(--on-c3); } .offer.on b { color: var(--c1-dark); } .offer.on small { color: var(--on-c3); opacity: .75; }
+.offer.gone { opacity: .6; } .offer.gone b { color: var(--muted); }
+.pl { background: var(--sticker); border-radius: 12px; } .pl em { font-family: var(--heavy); font-size: 15px; color: var(--c2); } .pl b { font-family: var(--heavy); font-size: 24px; color: var(--c1); } .pl span { color: var(--ink); }
+footer { color: var(--ink); font-weight: 800; letter-spacing: .06em; text-transform: uppercase; font-size: 11px; }
+
+@media (max-width: 1079px) {
+  body { padding: 8px 0 0; }
+  .app { margin: 0 8px 24px; padding: 0 14px 28px; border-radius: 18px; box-shadow: 5px 5px 0 var(--shadow); max-width: none; }
+  .top { margin: 16px 0 14px; padding: 10px 14px 18px; }
+  .wm { font-size: 38px; }
+  .tabs { gap: 4px; }
+  .tabs button { padding: 8px 2px; border-width: 3px; border-radius: 10px; }
+  .tabs span { font-size: 11px; letter-spacing: 0; }
+  .t { font-size: 12.5px; border-width: 2px; border-radius: 8px; }
+  .card { border-width: 5px; }
+  .offer span { font-size: 12px; } .offer b { font-size: 20px; }
+  .play-top b { font-size: 26px; } .d-score b { font-size: 54px; }
+  .slot.filled { width: 74px; } .slot .r { font-size: 22px; } .slot .n { font-size: 11px; }
+}

@@ -1,0 +1,25 @@
+{
+  "_hinweis": "Bekannte Spieler ausserhalb der Champions League (Saudi-Liga, MLS, ...) fuer den Klassik-Modus. Verein/Liga/Nummer von Hand gepflegt (Wikidata ist hier oft veraltet) - bitte vor dem Launch pruefen. number = null, wenn unsicher. Danach: build-extras.ps1, export-web.ps1",
+  "players": [
+    { "name": "Lionel Messi",            "club": "Inter Miami",         "country": "USA", "number": 10 },
+    { "name": "Cristiano Ronaldo",       "club": "Al-Nassr",            "country": "KSA", "number": 7 },
+    { "name": "Neymar",                  "club": "FC Santos",           "country": "BRA", "number": 10 },
+    { "name": "Karim Benzema",           "club": "Al-Hilal",            "country": "KSA", "number": null },
+    { "name": "Sadio Mané",              "club": "Al-Nassr",            "country": "KSA", "number": 10 },
+    { "name": "Kalidou Koulibaly",       "club": "Al-Hilal",            "country": "KSA", "number": 3 },
+    { "name": "Sergej Milinković-Savić", "club": "Al-Hilal",            "country": "KSA", "number": 22 },
+    { "name": "Ivan Toney",              "club": "Al-Ahli",             "country": "KSA", "number": null },
+    { "name": "Riyad Mahrez",            "club": "Al-Shamal",           "country": "QAT", "number": null },
+    { "name": "Luis Suárez", "id": "Q26517", "club": "Inter Miami",        "country": "USA", "number": 9 },
+    { "name": "Casemiro",                "club": "Inter Miami",         "country": "USA", "number": null },
+    { "name": "Thomas Müller",           "club": "Vancouver Whitecaps", "country": "CAN", "number": 13 },
+    { "name": "Son Heung-min",           "club": "Los Angeles FC",      "country": "USA", "number": 7 },
+    { "name": "Hugo Lloris",             "club": "Los Angeles FC",      "country": "USA", "number": 1 },
+    { "name": "Marco Reus",              "club": "LA Galaxy",           "country": "USA", "number": 11 },
+    { "name": "Antoine Griezmann",       "club": "Orlando City",        "country": "USA", "number": 7 },
+    { "name": "Robert Lewandowski",      "club": "Chicago Fire",        "country": "USA", "number": null },
+    { "name": "Luka Modrić",             "club": "AC Mailand",          "country": "ITA", "number": 14 },
+    { "name": "David de Gea",            "club": "AC Florenz",          "country": "ITA", "number": 43 },
+    { "name": "Ángel Di María",          "club": "Rosario Central",     "country": "ARG", "number": 11 }
+  ]
+}

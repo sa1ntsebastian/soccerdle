@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="de" data-logo="1" data-header="band" data-gloss="edge" data-trim="standard">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Soccerdle – Sticker-Album Labor</title>
+<link rel="stylesheet" href="stile-base.css">
+<link rel="stylesheet" href="sticker.css">
+<link rel="stylesheet" href="sticker-lab.css">
+<style>
+  /* Sticker-Album Klassik (B1) – Tag und Nacht */
+  :root { --bg: #ffd21f; --pattern: repeating-linear-gradient(135deg, rgba(255,255,255,.22) 0 14px, transparent 14px 28px); --paper: #fff; --sticker: #fff; --field-bg: #fff; --soft: #f4f4f4; --ink: #111; --outline: #111; --shadow: #111; --muted: #4a4a4a;
+    --c1: #e4002b; --c1-dark: #e4002b; --c2: #0a4fc4; --c3: #ffd21f; --on-c3: #111; --ok: #00a651; --warn: #ffd21f; --bad: #e4002b; --head-bg: #e4002b; --head-ink: #fff; --wm1: #fff; --wm2: #ffd21f; --wm-stroke: #111;
+    --f1: #1fae5b; --f2: #17a04f; --title-shadow: #ffd21f; --maxw: 1320px; color-scheme: light; }
+  :root[data-theme="dark"] { --bg: #0f1226; --pattern: repeating-linear-gradient(135deg, rgba(255,210,31,.06) 0 14px, transparent 14px 28px); --paper: #1b2040; --sticker: #232a52; --field-bg: #10142c; --soft: #1f2547; --ink: #f7efd2; --outline: #f7efd2; --shadow: #000; --muted: #aeb4d6;
+    --c1: #ff4262; --c1-dark: #b0132f; --c2: #4f8bff; --c3: #ffd21f; --on-c3: #111; --ok: #1fbf6a; --warn: #ffd21f; --bad: #ef3b52; --head-bg: #b0132f; --head-ink: #fff; --wm1: #fff; --wm2: #ffd21f; --wm-stroke: #000;
+    --f1: #167a42; --f2: #126f3b; --title-shadow: #b0132f; color-scheme: dark; }
+  @media (min-width: 1500px) { :root { --maxw: 1440px; } }
+</style>
+</head>
+<body>
+<div class="app" id="app"></div>
+
+<div class="lab" id="lab">
+  <div class="grp" data-key="logo"><b>Logo</b><button data-v="1">1 Burst</button><button data-v="2">2 Ball-O</button><button data-v="3">3 Banner</button><button data-v="4">4 Trikot</button><button data-v="5">5 Disc</button></div>
+  <div class="grp" data-key="header"><b>Kopf</b><button data-v="band">Band durchgehend</button><button data-v="sticker">Sticker-Streifen</button><button data-v="album">Album-Seite</button></div>
+  <div class="grp" data-key="gloss"><b>Glanz</b><button data-v="none">aus</button><button data-v="behind">hinter Text</button><button data-v="edge">Kante</button><button data-v="corner">Ecke</button></div>
+  <div class="grp" data-key="trim"><b>Stil</b><button data-v="standard">Standard</button><button data-v="sticker">Voll-Sticker</button></div>
+</div>
+
+<script src="stile.js"></script>
+<script>
+  const ball = (fill, ink, patch) => `<circle cx="40" cy="40" r="17" fill="${fill}" stroke="${ink}" stroke-width="3"/><path d="m40 31 8 5.8-3 9.4H35l-3-9.4z" fill="${patch}" stroke="${ink}" stroke-width="2"/><path d="M40 31v-7M48 36.8l7-2.4M45 46.2l4.6 6M35 46.2l-4.6 6M32 36.8l-7-2.4" stroke="${ink}" stroke-width="2.4" fill="none"/>`;
+  const burst = (n, r1, r2) => Array.from({ length: n * 2 }, (_, i) => { const a = i * Math.PI / n, r = i % 2 ? r1 : r2; return `${(40 + r * Math.cos(a)).toFixed(1)},${(40 + r * Math.sin(a)).toFixed(1)}`; }).join(' ');
+  const WM = '<span class="wm"><span class="w1">SOCCER</span><span class="w2">DLE</span></span>';
+  const logos = `
+    <span class="lg lg1"><svg viewBox="0 0 80 80"><polygon points="${burst(10, 26, 34)}" fill="#ffd21f" stroke="#111" stroke-width="3" stroke-linejoin="round"/>${ball('#fff', '#111', '#0a4fc4')}</svg>${WM}</span>
+    <span class="lg lg2"><span class="wm"><span class="w1">S</span><svg class="o-ball" viewBox="0 0 80 80">${ball('#fff', '#111', '#0a4fc4').replace('r="17"', 'r="34"').replace(/<path d="m40 31[^>]*>/, '<path d="m40 18 15 11-5.7 17.6H30.7L25 29z" fill="#0a4fc4" stroke="#111" stroke-width="3"/>').replace(/<path d="M40 31v-7[^>]*>/, '<path d="M40 18V6M55 29l13-4M49.3 46.6l8 11M30.7 46.6l-8 11M25 29l-13-4" stroke="#111" stroke-width="3" fill="none"/>')}</svg><span class="w1">CCER</span><span class="w2">DLE</span></span></span>
+    <span class="lg lg3"><span class="ribbon"><span class="in"><i>★</i>SOCCERDLE<i>★</i></span></span></span>
+    <span class="lg lg4"><svg viewBox="0 0 80 76"><path d="M22 4 L33 1 Q40 9 47 1 L58 4 L76 18 L66 32 L58 27 L58 74 L22 74 L22 27 L14 32 L4 18 Z" fill="#e4002b" stroke="#111" stroke-width="3" stroke-linejoin="round"/><text x="40" y="56" text-anchor="middle" font-family="Impact, Barlow Condensed, sans-serif" font-size="30" fill="#fff" stroke="#111" stroke-width="1.5" paint-order="stroke">26</text></svg>${WM}</span>
+    <span class="lg lg5"><span class="disc"><svg viewBox="0 0 80 80">${ball('#fff', '#111', '#0a4fc4')}</svg></span><span class="stack"><span class="wm"><span class="w1">SOCCER</span></span><span class="wm"><span class="w2">DLE</span></span></span></span>`;
+  renderMock(document.getElementById('app'), { fullLogo: true, logo: logos });
+
+  // Bedienleiste: setzt data-Attribute am <html>, merkt sich die Wahl in der URL (#logo=2&header=album ...)
+  const root = document.documentElement, lab = document.getElementById('lab');
+  const keys = ['logo', 'header', 'gloss', 'trim'];
+  const fromHash = new URLSearchParams(location.hash.slice(1)); keys.forEach(k => { if (fromHash.get(k)) root.dataset[k] = fromHash.get(k); });
+  const paint = () => { lab.querySelectorAll('.grp').forEach(g => g.querySelectorAll('button').forEach(b => b.classList.toggle('on', root.dataset[g.dataset.key] === b.dataset.v)));
+    history.replaceState(null, '', '#' + keys.map(k => `${k}=${root.dataset[k]}`).join('&')); };
+  lab.addEventListener('click', e => { const b = e.target.closest('button'); if (!b) return; root.dataset[b.parentElement.dataset.key] = b.dataset.v; paint(); });
+  paint();
+</script>
+</body>
+</html>

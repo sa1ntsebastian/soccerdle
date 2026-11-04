@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Soccerdle – Stil 3: Pixel-Retro</title>
+<link rel="stylesheet" href="stile-base.css">
+<style>
+  /* Stil 3 – Pixel-Retro: 16-Bit-Palette, Monospace, abgestufte Ecken (clip-path), Bevel-Kacheln, Pixel-Rasen, Scanlines */
+  :root { --bg: #1a1c2c; --panel: #29366f; --panel2: #333c57; --edge: #f4f4f4; --text: #f4f4f4; --muted: #94b0c2;
+    --green: #38b764; --green-d: #257179; --yellow: #ffcd75; --red: #b13e53; --blue: #41a6f6; --black: #0b0b14; --px: 4px; }
+  body { background: var(--bg) conic-gradient(#20223a 25%, #1a1c2c 0 50%, #20223a 0 75%, #1a1c2c 0) 0 0 / 16px 16px; color: var(--text);
+    font: 15px/1.5 "Courier New", "Lucida Console", monospace; font-weight: 700; }
+  body::after { content: ""; position: fixed; inset: 0; pointer-events: none; z-index: 50; background: repeating-linear-gradient(0deg, rgba(0,0,0,.14) 0 1px, transparent 1px 3px); }
+  .muted { color: var(--muted); }
+  /* abgestufte Pixel-Ecken */
+  .px { clip-path: polygon(0 4px, 4px 4px, 4px 0, calc(100% - 4px) 0, calc(100% - 4px) 4px, 100% 4px, 100% calc(100% - 4px), calc(100% - 4px) calc(100% - 4px), calc(100% - 4px) 100%, 4px 100%, 4px calc(100% - 4px), 0 calc(100% - 4px)); }
+  .card, .tools button, .subtabs button, .search, .hint, .t, .slot, .offer, .pl, .tabs button, .acts i, .legend i { clip-path: polygon(0 4px, 4px 4px, 4px 0, calc(100% - 4px) 0, calc(100% - 4px) 4px, 100% 4px, 100% calc(100% - 4px), calc(100% - 4px) calc(100% - 4px), calc(100% - 4px) 100%, 4px 100%, 4px calc(100% - 4px), 0 calc(100% - 4px)); }
+  .top { padding-top: 22px; }
+  .logo-mark svg { width: 44px; height: 44px; image-rendering: pixelated; }
+  .wm { font-weight: 900; font-size: 28px; letter-spacing: .14em; text-shadow: 3px 3px 0 #000; }
+  .w2 { color: var(--yellow); }
+  .logo-txt small { color: var(--green); font-size: 11px; letter-spacing: .2em; text-transform: uppercase; }
+  .tools button { background: var(--panel); border: 4px solid var(--edge); color: var(--text); box-shadow: inset -4px -4px 0 rgba(0,0,0,.35), inset 4px 4px 0 rgba(255,255,255,.2); }
+  .tools button:active { background: var(--blue); }
+  .tabs { gap: 6px; }
+  .tabs button { background: var(--panel2); border: 4px solid #000; color: var(--muted); text-transform: uppercase; letter-spacing: .06em; box-shadow: inset 4px 4px 0 rgba(255,255,255,.12), inset -4px -4px 0 rgba(0,0,0,.4); }
+  .tabs button.on { background: var(--green); color: #05140a; border-color: var(--edge); box-shadow: inset 4px 4px 0 rgba(255,255,255,.45), inset -4px -4px 0 rgba(0,0,0,.35); }
+  .tabs svg { stroke-width: 2.4; stroke-linecap: square; stroke-linejoin: miter; }
+  .card { background: var(--panel); border: 4px solid var(--edge); padding: 20px; box-shadow: inset 4px 4px 0 rgba(255,255,255,.15), inset -4px -4px 0 rgba(0,0,0,.4); }
+  .subtabs button { background: var(--panel2); border: 4px solid #000; color: var(--muted); text-transform: uppercase; font-size: 13px; }
+  .subtabs .on { background: var(--yellow); color: #3b2300; border-color: var(--edge); }
+  .play-top b { font-size: 22px; text-transform: uppercase; letter-spacing: .1em; text-shadow: 2px 2px 0 #000; color: var(--yellow); }
+  .yest { color: var(--muted); } .yest b { color: var(--text); }
+  .search { background: #0e1022; border: 4px solid var(--edge); color: var(--muted); height: 52px; box-shadow: inset 4px 4px 0 rgba(0,0,0,.6); }
+  .search input::placeholder { color: var(--muted); } .search:focus-within { border-color: var(--yellow); }
+  .hint { background: var(--panel2); border: 4px solid #000; color: var(--muted); }
+  .hint i { color: var(--blue); } .hint.open { background: var(--green-d); border-color: var(--edge); color: var(--text); } .hint.open b { color: var(--yellow); }
+  .g-head em { color: var(--blue); font-size: 10.5px; }
+  .g-row { border-top: 4px dotted rgba(255,255,255,.18); }
+  .g-name b { text-transform: uppercase; letter-spacing: .03em; } .g-name small { color: var(--muted); }
+  .t { color: #fff; border: 4px solid #000; text-shadow: 2px 2px 0 rgba(0,0,0,.5); box-shadow: inset 4px 4px 0 rgba(255,255,255,.4), inset -4px -4px 0 rgba(0,0,0,.35); }
+  .t.hit { background: var(--green); } .t.near { background: var(--yellow); color: #3b2300; text-shadow: none; } .t.miss { background: var(--red); }
+  .flag { image-rendering: pixelated; border: 2px solid #000; border-radius: 0; }
+  .g-row.win .g-name b { color: var(--yellow); }
+  .legend { color: var(--muted); } .legend .hit { background: var(--green); } .legend .near { background: var(--yellow); } .legend .miss { background: var(--red); }
+  .d-score span { color: var(--blue); text-transform: uppercase; letter-spacing: .12em; font-size: 12px; }
+  .d-score b { font-size: 54px; color: var(--yellow); text-shadow: 4px 4px 0 #000; letter-spacing: .04em; }
+  .pitch { border: 4px solid var(--edge); background: repeating-linear-gradient(0deg, #2f8f4b 0 32px, #2a8044 32px 64px); image-rendering: pixelated; box-shadow: inset 0 0 0 4px #000; }
+  .pitch::before { content: ""; position: absolute; left: 12px; right: 12px; top: 50%; height: 4px; background: rgba(255,255,255,.85); }
+  .pitch::after { content: ""; position: absolute; left: 50%; top: 50%; width: 24%; aspect-ratio: 1; translate: -50% -50%; border: 4px solid rgba(255,255,255,.85); }
+  .slot.filled { background: var(--text); color: #14172b; border: 4px solid #000; box-shadow: inset 4px 4px 0 #fff, inset -4px -4px 0 #aab; }
+  .slot .r { color: var(--red); font-weight: 900; font-size: 22px; } .slot small { color: #55597a; }
+  .slot.empty { border: 4px dashed rgba(255,255,255,.85); color: #fff; background: rgba(0,0,0,.2); }
+  .slot.pend { background: var(--yellow); }
+  .acts i { border-radius: 0; border: 3px solid #000; } .acts .ok { background: var(--green); color: #05140a; } .acts .undo { background: var(--text); color: #14172b; }
+  .intro { color: var(--muted); } .intro b { color: var(--text); }
+  .offer { background: var(--panel2); border: 4px solid #000; box-shadow: inset 4px 4px 0 rgba(255,255,255,.12), inset -4px -4px 0 rgba(0,0,0,.4); }
+  .offer b { color: var(--yellow); text-shadow: 2px 2px 0 #000; } .offer small { color: var(--muted); }
+  .offer.on { border-color: var(--edge); background: var(--green-d); }
+  .pl { background: var(--panel2); border: 4px solid #000; } .pl em { color: var(--blue); } .pl b { color: var(--yellow); }
+  footer { color: var(--muted); }
+</style>
+</head>
+<body>
+<div class="app" id="app"></div>
+<script src="stile.js"></script>
+<script>
+  // Pixel-Ball aus Rechtecken (12x12 Raster, scharfe Kanten)
+  const rows = ['....0000....', '..00111100..', '.0111001110.', '.0110000110.', '011100001110', '011000000110', '011000000110', '011100001110', '.0110000110.', '.0111001110.', '..00111100..', '....0000....'];
+  const px = rows.map((r, y) => [...r].map((c, x) => c === '.' ? '' : `<rect x="${x}" y="${y}" width="1" height="1" fill="${c === '0' ? '#000' : (x + y) % 5 === 0 ? '#38b764' : '#f4f4f4'}"/>`).join('')).join('');
+  renderMock(document.getElementById('app'), { logo: `<span class="logo-mark"><svg viewBox="0 0 12 12" shape-rendering="crispEdges">${px}</svg></span>` });
+</script>
+</body>
+</html>

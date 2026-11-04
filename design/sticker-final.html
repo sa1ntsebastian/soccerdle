@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Soccerdle – Sticker-Album (Endfassung Entwurf)</title>
+<link rel="stylesheet" href="stile-base.css">
+<link rel="stylesheet" href="sticker.css">
+<style>
+  /* Gewählt: Logo "Ball statt O", Kopf "Album-Seite", Glanz aus, Standard-Stil. Tag und Nacht. */
+  :root { --bg: #ffd21f; --pattern: repeating-linear-gradient(135deg, rgba(255,255,255,.22) 0 14px, transparent 14px 28px);
+    --paper: #fff; --sticker: #fff; --field-bg: #fff; --soft: #f6f6f3; --ink: #111; --outline: #111; --shadow: #111; --muted: #4a4a4a;
+    --c1: #e4002b; --c1-dark: #e4002b; --c2: #0a4fc4; --c3: #ffd21f; --on-c3: #111; --ok: #00a651; --warn: #ffd21f; --bad: #e4002b;
+    --head-bg: transparent; --head-ink: #111; --wm1: #1f4fd8; --wm2: #e4002b; --wm-stroke: transparent; --wm-shadow: #111; --title-color: #1f4fd8; --title-shadow: #111; --line: #111;
+    --f1: #1fae5b; --f2: #17a04f; --maxw: 1320px; color-scheme: light; }
+  :root[data-theme="dark"] { --bg: #0f1226; --pattern: repeating-linear-gradient(135deg, rgba(255,210,31,.06) 0 14px, transparent 14px 28px);
+    --paper: #1b2040; --sticker: #232a52; --field-bg: #10142c; --soft: #222952; --ink: #f7efd2; --outline: #f7efd2; --shadow: #000; --muted: #b9bfdf;
+    --c1: #ff4a6a; --c1-dark: #b0132f; --c2: #6c9bff; --c3: #ffd21f; --on-c3: #111; --ok: #1fbf6a; --warn: #ffd21f; --bad: #ef3b52;
+    --head-bg: transparent; --head-ink: #f7efd2; --wm1: #ff4a6a; --wm2: #ffd21f; --wm-stroke: transparent; --wm-shadow: #04050d; --title-color: #ff4a6a; --title-shadow: #05060f; --line: #05060f;
+    --f1: #167a42; --f2: #126f3b; color-scheme: dark; }
+  @media (min-width: 1500px) { :root { --maxw: 1440px; } }
+
+  body { overflow-x: hidden; padding: 18px 0 8px; }
+  /* Album-Seite: das ganze Blatt mit Rahmen und Eckhaltern */
+  .app { background-color: var(--paper); border: 5px solid var(--outline); border-radius: 24px; box-shadow: 8px 8px 0 var(--shadow); margin: 0 auto 40px; padding: 0 28px 40px; position: relative; max-width: calc(var(--maxw) - 40px);
+    background-image: linear-gradient(135deg, var(--c1) 0 26px, transparent 26px), linear-gradient(225deg, var(--c1) 0 26px, transparent 26px), linear-gradient(45deg, var(--c1) 0 26px, transparent 26px), linear-gradient(315deg, var(--c1) 0 26px, transparent 26px);
+    background-repeat: no-repeat; background-position: 0 0, 100% 0, 0 100%, 100% 100%; }
+  .top { background: transparent; border-bottom: 4px dashed var(--outline); margin: 0 -28px 18px; padding: 22px 28px 16px; color: var(--ink); }
+  .card { background: var(--soft); }
+  .tabs { margin-top: 0; }
+  /* Fette Sticker-Schrift (Lilita One) für Logo, Titel und große Zahlen: dunkle Kontur + kurzer Schatten wie bei der Rating-Zahl */
+  .wm { display: inline-block; white-space: nowrap; font-family: var(--impact); font-weight: 400; font-style: italic; font-size: 60px; line-height: 1.1; letter-spacing: .03em; margin: 0; color: var(--wm1);
+    transform: rotate(-2deg); -webkit-text-stroke: .05em var(--line); paint-order: stroke fill; text-shadow: .05em .05em 0 var(--line); }
+  .wm .w2 { color: var(--wm2); }
+  /* Ball sitzt auf der Grundlinie und ist so hoch wie die Versalien (Höhe wird je Schrift gemessen, --cap) */
+  .wm .o-ball { display: inline-block; width: calc(var(--cap, .72) * 1.04em); height: calc(var(--cap, .72) * 1.04em); vertical-align: baseline; margin: 0 .03em 0 .02em; filter: drop-shadow(.05em .05em 0 var(--line)); }
+  /* Titel: gleiche Behandlung */
+  .play-top b, .d-score b { font-family: var(--impact); font-weight: 400; font-style: italic; transform: none; -webkit-text-stroke: .06em var(--line); paint-order: stroke fill; text-shadow: .05em .05em 0 var(--line); }
+  .play-top b { color: var(--title-color); font-size: 34px; letter-spacing: .02em; }
+  .d-score b { color: var(--c1); font-size: 66px; line-height: 1; }
+  /* kein Glanz auf den Kacheln */
+  .t::after { display: none; }
+  .offer.gone { opacity: .6; }
+  .offer.gone b { color: var(--muted); }
+  /* Kacheltext immer gut lesbar */
+  .t { font-size: 16.5px; text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000, 2px 2px 0 rgba(0,0,0,.45); }
+  .t.near { color: #1a1300; text-shadow: none; }
+  .slot .n, .pl span, .g-name b { color: var(--ink); }
+
+  @media (max-width: 1079px) {
+    body { padding: 8px 0 0; }
+    .app { margin: 0 8px 24px; padding: 0 14px 28px; border-radius: 18px; box-shadow: 5px 5px 0 var(--shadow); max-width: none;
+      background-image: linear-gradient(135deg, var(--c1) 0 18px, transparent 18px), linear-gradient(225deg, var(--c1) 0 18px, transparent 18px), linear-gradient(45deg, var(--c1) 0 18px, transparent 18px), linear-gradient(315deg, var(--c1) 0 18px, transparent 18px); }
+    .top { margin: 0 -14px 14px; padding: 18px 14px 12px; }
+    .wm { font-size: 40px; }
+    .play-top b { font-size: 28px; } .d-score b { font-size: 54px; }
+    .tabs { gap: 4px; }
+    .tabs button { padding: 8px 2px; }
+    .t { font-size: 12.5px; }
+  }
+</style>
+</head>
+<body>
+<div class="app" id="app"></div>
+<script src="stile.js"></script>
+<script>
+  const ball = `<svg class="o-ball" viewBox="0 0 80 80" aria-hidden="true"><circle cx="40" cy="40" r="37" fill="#fff" stroke="#111" stroke-width="4"/>
+    <path d="m40 17 16 11.7-6.1 18.8H30.1L24 28.7z" fill="#1f4fd8" stroke="#111" stroke-width="3.5"/>
+    <path d="M40 17V4M56 28.7l14-4.6M49.9 47.5l8.6 11.8M30.1 47.5l-8.6 11.8M24 28.7l-14-4.6" stroke="#111" stroke-width="3.5" fill="none"/></svg>`;
+  renderMock(document.getElementById('app'), { fullLogo: true, logo: `<span class="wm" role="img" aria-label="Soccerdle">S${ball}CCER<span class="w2">DLE</span></span>` });
+  // Höhe der Versalien der Schrift messen -> Ball genauso hoch
+  document.fonts.ready.then(() => { const c = document.createElement('canvas').getContext('2d'); c.font = '100px Impact, "Arial Black", "Barlow Condensed", sans-serif'; document.documentElement.style.setProperty('--cap', (c.measureText('H').actualBoundingBoxAscent / 100).toFixed(3)); });
+</script>
+</body>
+</html>

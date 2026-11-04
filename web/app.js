@@ -9,6 +9,7 @@ const CONFIG = {
   // Testphase: zeigt "Neues Rätsel (Test)" – lädt zufällige Spieler aus dem Tages-Pool,
   // ohne Statistik/Tagesrätsel zu verändern. VOR DEM LAUNCH auf false setzen.
   testMode: true,
+  siteUrl: 'https://deine-domain.at',   // PLATZHALTER: Adresse der Seite (kommt in den Teilen-Text und aufs Bild)
   season: 'Champions League 2026/27',
   launchDate: '2026-11-01',      // Tag 1 für die Rätsel-Nummer
   timeZone: 'Europe/Vienna',     // Tageswechsel um Mitternacht (AT/DE)
@@ -19,7 +20,8 @@ const CONFIG = {
   minPageviewsForSolution: 100000,
   near: { age: 2, height: 3, number: 3 },
   hints: [
-    { after: 4,  label: 'Detailposition', get: p => SUBPOS[p.subPosition] || p.subPosition || '–' },
+    { after: 3,  label: 'Liga',           get: p => p.league === 'Andere' ? 'Andere (' + countryName2(p.leagueCountry) + ')' : p.league },
+    { after: 5,  label: 'Detailposition', get: p => SUBPOS[p.subPosition] || p.subPosition || '–' },
     { after: 7,  label: 'Verein',         get: p => p.club },
     { after: 10, label: 'Initialen',      get: p => initials(p.name) },
   ],
@@ -59,7 +61,25 @@ const COUNTRIES = {
   UAE: ['VAE', 'AFC'], UZB: ['Usbekistan', 'AFC'], JOR: ['Jordanien', 'AFC'], SYR: ['Syrien', 'AFC'],
   PHI: ['Philippinen', 'AFC'], IDN: ['Indonesien', 'AFC'],
   NZL: ['Neuseeland', 'OFC'],
+  // ergänzt: Länder mit wenigen Spielern, UK (Wikidata führt England/Schottland/Wales teils als GBR) und historische Teams
+  GBR: ['Vereinigtes Königreich', 'UEFA'], THA: ['Thailand', 'AFC'], PRK: ['Nordkorea', 'AFC'], VIE: ['Vietnam', 'AFC'],
+  IND: ['Indien', 'AFC'], BAN: ['Bangladesch', 'AFC'], MAS: ['Malaysia', 'AFC'], SIN: ['Singapur', 'AFC'], BRU: ['Brunei', 'AFC'],
+  BHU: ['Bhutan', 'AFC'], KUW: ['Kuwait', 'AFC'], OMA: ['Oman', 'AFC'], TJK: ['Tadschikistan', 'AFC'], CAM: ['Kambodscha', 'AFC'],
+  TRI: ['Trinidad und Tobago', 'CONCACAF'], GUA: ['Guatemala', 'CONCACAF'], ESA: ['El Salvador', 'CONCACAF'], BAR: ['Barbados', 'CONCACAF'],
+  ARU: ['Aruba', 'CONCACAF'], AHO: ['Niederländische Antillen', 'CONCACAF'],
+  AND: ['Andorra', 'UEFA'], FRO: ['Färöer', 'UEFA'], LIE: ['Liechtenstein', 'UEFA'], SMR: ['San Marino', 'UEFA'], MLT: ['Malta', 'UEFA'],
+  SLE: ['Sierra Leone', 'CAF'], SUD: ['Sudan', 'CAF'], BDI: ['Burundi', 'CAF'], LBR: ['Liberia', 'CAF'], CAF: ['Zentralafrika', 'CAF'],
+  SEY: ['Seychellen', 'CAF'], TAN: ['Tansania', 'CAF'], NAM: ['Namibia', 'CAF'],
+  FIJ: ['Fidschi', 'OFC'], SAM: ['Samoa', 'OFC'],
+  // alte / abweichende Codes (Flagge über FLAG_FILE)
+  NGR: ['Nigeria', 'CAF'], IRI: ['Iran', 'AFC'], SLO: ['Slowenien', 'UEFA'], BUR: ['Burkina Faso', 'CAF'], LAT: ['Lettland', 'UEFA'],
+  INA: ['Indonesien', 'AFC'], KOS: ['Kosovo', 'UEFA'], LBA: ['Libyen', 'CAF'], GEQ: ['Äquatorialguinea', 'CAF'], GBS: ['Guinea-Bissau', 'CAF'],
+  SCG: ['Serbien und Montenegro', 'UEFA'], FRY: ['Bundesrepublik Jugoslawien', 'UEFA'], YUG: ['Jugoslawien', 'UEFA'],
+  TCH: ['Tschechoslowakei', 'UEFA'], URS: ['Sowjetunion', 'UEFA'], GDR: ['DDR', 'UEFA'], FRG: ['BR Deutschland', 'UEFA'],
 };
+// Code -> Dateiname der Flagge, wenn er vom Code abweicht (Dateien in flags/)
+const FLAG_FILE = { NGR: 'NGA', IRI: 'IRN', SLO: 'SVN', BUR: 'BFA', LAT: 'LVA', INA: 'IDN', KOS: 'KVX', LBA: 'LBY', GEQ: 'EQG', GBS: 'GNB',
+  SCG: 'SRB', FRY: 'YUG', TCH: 'CZE', FRG: 'GER', AHO: 'CUW' };
 
 const SUBPOS = {
   'Goalkeeper': 'Torwart', 'Centre-Back': 'Innenverteidiger', 'Left-Back': 'Linksverteidiger',
@@ -71,14 +91,126 @@ const SUBPOS = {
 const FOOT = { R: 'Rechts', L: 'Links', B: 'Beide' };
 const POS_ORDER = ['TW', 'ABW', 'MF', 'ST'];
 
+/* ---------- Anleitungen: Schritt-Karten mit Mini-Grafiken ---------- */
+const HT = {
+  // Anleitung = Einleitung + nummerierte Schritte (Titel, Text, optionale Grafik)
+  page(lead, steps, extra = '') {
+    return `<div class="howto"><p class="ht-lead">${lead}</p>${extra}
+      ${steps.map((s, i) => `<div class="ht-step"><span class="ht-num">${i + 1}</span><div class="ht-body">
+        <b class="ht-title">${s.title}</b><p>${s.text}</p>${s.art ? `<div class="ht-art">${s.art}</div>` : ''}</div></div>`).join('')}</div>`;
+  },
+  // Kachel wie im Spiel: status = hit | near | miss | unknown
+  tile: (label, value, status) => `<span class="ex-tile ${status}"><small>${label}</small><b>${value}</b></span>`,
+  legend: () => `<div class="ex-legend"><span><i class="hit"></i>richtig</span><span><i class="near"></i>fast</span><span><i class="miss"></i>falsch</span></div>`,
+  flag: code => `<img class="flag mini" src="flags/${code}.svg" alt="">`,
+  // Mini-Spielfeld mit Punkten: dots = [x, y, text, cls]
+  pitch(dots, w = 150, h = 190) {
+    return `<svg class="ex-pitch" viewBox="0 0 ${w} ${h}" width="${w}" height="${h}" aria-hidden="true">
+      <rect x="1" y="1" width="${w - 2}" height="${h - 2}" rx="8" fill="#2f9555" stroke="rgba(255,255,255,.6)" stroke-width="2"/>
+      <circle cx="${w / 2}" cy="0" r="${w * .17}" fill="none" stroke="rgba(255,255,255,.45)" stroke-width="2"/>
+      <rect x="${w * .27}" y="${h - h * .13}" width="${w * .46}" height="${h * .13}" fill="none" stroke="rgba(255,255,255,.45)" stroke-width="2"/>
+      ${dots.map(([x, y, t, c]) => `<g class="ex-dot ${c || ''}"><circle cx="${x}" cy="${y}" r="10"/><text x="${x}" y="${y + 4}" text-anchor="middle">${t || ''}</text></g>`).join('')}</svg>`;
+  },
+};
+
+// Elf auf dem Mini-Feld (4-2-3-1), optional mit markierter Position
+const HT_ELF = [[75, 28], [28, 62], [75, 66], [122, 62], [52, 108], [98, 108], [22, 140], [58, 150], [92, 150], [128, 140], [75, 174]];
+const htElf = (hi = -1, text = '?') => HT.pitch(HT_ELF.map(([x, y], i) => [x, y, i === hi ? text : '', i === hi ? 'q' : '']));
+
+/* ---------- Teilen: Ergebnis-Bild (Canvas, Pixel-Optik) + Teilen-Dialog des Smartphones ---------- */
+// card = { mode, big, sub, grid?: [['hit','near',...], ...], lines?: ['🟩⬛⬛', ...], pitch?: { slots: [{x, y, name, rating}], caption } }
+function drawShareCard(card) {
+  const W = 1080, H = card.pitch ? 1500 : 1080;
+  const c = document.createElement('canvas'); c.width = W; c.height = H;
+  const g = c.getContext('2d');
+  g.imageSmoothingEnabled = false;
+  const FONT = "'Digits', 'Pixelify Sans', 'Courier New', monospace", BODY = "'Tiny5', 'Courier New', monospace";
+  const COL = { hit: '#1d8a43', near: '#ffd33d', miss: '#cf2f2f', unknown: '#7a8290' }, INK = '#14172b';
+  // Pixel-Kasten mit Treppen-Ecken (Umriss ohne Eckpixel)
+  const box = (x, y, w, h, fill, line = INK, t = 6) => { g.fillStyle = line; g.fillRect(x - t, y, w + 2 * t, h); g.fillRect(x, y - t, w, h + 2 * t); g.fillStyle = fill; g.fillRect(x, y, w, h); };
+  // Text mit Pixel-Kontur
+  const outlined = (txt, x, y, fill, o = 5) => { g.fillStyle = '#0b0f1c'; for (const [dx, dy] of [[-o, 0], [o, 0], [0, -o], [0, o], [-o, -o], [o, -o], [-o, o], [o, o]]) g.fillText(txt, x + dx, y + dy); g.fillStyle = fill; g.fillText(txt, x, y); };
+  // Hintergrund: Pixel-Rasen mit Streifen und Büscheln
+  g.fillStyle = '#3f9b4a'; g.fillRect(0, 0, W, H);
+  g.fillStyle = '#378f43'; for (let y = 0; y < H; y += 128) g.fillRect(0, y, W, 64);
+  g.fillStyle = '#2f7d3a'; for (let y = 16; y < H; y += 48) for (let x = (y / 48 % 2) * 24 + 8; x < W; x += 96) g.fillRect(x, y, 8, 8);
+  g.textAlign = 'center'; g.textBaseline = 'alphabetic';
+  // Kopfleiste mit Zielflaggen-Schachbrett
+  g.fillStyle = '#123524'; g.fillRect(0, 0, W, 190);
+  for (let x = 0; x < W; x += 32) for (let r = 0; r < 2; r++) { g.fillStyle = (x / 32 + r) % 2 ? INK : '#ffd33d'; g.fillRect(x, 190 + r * 16, 32, 16); }
+  g.font = `400 64px 'Press Start 2P', ${FONT}`;   // Logo-Schrift (in Pixelify wirkt das C wie ein O)
+  const w1 = g.measureText('SOCCER').width, w2 = g.measureText('DLE').width, x0 = (W - w1 - w2) / 2;
+  g.textAlign = 'left'; outlined('SOCCER', x0, 116, '#ffd33d', 5); outlined('DLE', x0 + w1, 116, '#fff', 5); g.textAlign = 'center';
+  g.fillStyle = '#ffd33d'; g.font = `500 40px ${BODY}`; g.fillText(card.mode.toUpperCase(), W / 2, 162);
+  // großes Ergebnis
+  let bigSize = card.pitch ? 150 : 170;
+  g.font = `700 ${bigSize}px ${FONT}`;
+  while (g.measureText(card.big).width > W - 160 && bigSize > 60) { bigSize -= 8; g.font = `700 ${bigSize}px ${FONT}`; }
+  outlined(card.big, W / 2, card.pitch ? 380 : 440, '#fff', 8);
+  g.font = `500 44px ${BODY}`; if (card.sub) outlined(card.sub, W / 2, card.pitch ? 446 : 510, '#f6ecd2', 3);
+  let y = card.pitch ? 500 : 570;
+  if (card.grid) {          // Kacheln wie im Spiel
+    const rows = card.grid.slice(0, 8), n = rows[0] ? rows[0].length : 7, s = 84, gap = 22, w0 = n * s + (n - 1) * gap, x0g = (W - w0) / 2;
+    rows.forEach((r, i) => r.forEach((st, k) => box(x0g + k * (s + gap), y + i * (s + gap), s, s, COL[st] || COL.unknown, INK, 6)));
+    y += rows.length * (s + gap);
+    if (card.grid.length > rows.length) { g.font = `500 36px ${BODY}`; outlined(`+ ${card.grid.length - rows.length} weitere`, W / 2, y + 40, '#fff', 3); }
+  }
+  if (card.lines) { g.font = `500 64px ${BODY}`; card.lines.slice(0, 8).forEach((l, i) => { g.fillStyle = '#fff'; g.fillText(l, W / 2, y + 70 + i * 86); }); }
+  if (card.pitch) {         // Elf als Namensschilder mit Rating auf dem Rasen
+    const px = 130, py = y, pw = W - 260, ph = 880;
+    g.fillStyle = '#2f8f3c'; g.fillRect(px, py, pw, ph); g.fillStyle = '#44a853'; for (let yy = 0; yy < ph; yy += 160) g.fillRect(px, py + yy, pw, 80);
+    g.fillStyle = INK; for (const [rx, ry, rw, rh] of [[px - 8, py - 8, pw + 16, 8], [px - 8, py + ph, pw + 16, 8], [px - 8, py - 8, 8, ph + 16], [px + pw, py - 8, 8, ph + 16]]) g.fillRect(rx, ry, rw, rh);
+    g.fillStyle = '#f4f4f4'; g.fillRect(px + 16, py + 16, pw - 32, 6); g.fillRect(px + 16, py + ph - 22, pw - 32, 6); g.fillRect(px + 16, py + 16, 6, ph - 32); g.fillRect(px + pw - 22, py + 16, 6, ph - 32); g.fillRect(px + 16, py + ph / 2 - 3, pw - 32, 6);
+    g.fillRect(px + pw / 2 - 90, py + ph / 2 - 90, 180, 6); g.fillRect(px + pw / 2 - 90, py + ph / 2 + 84, 180, 6); g.fillRect(px + pw / 2 - 90, py + ph / 2 - 90, 6, 180); g.fillRect(px + pw / 2 + 84, py + ph / 2 - 90, 6, 180);
+    for (const s of card.pitch.slots) {
+      const cx = px + pw * s.x / 100, cy = py + ph * s.y / 100 + 6;
+      box(cx - 70, cy - 40, 140, 80, '#101426', '#fff', 4);
+      g.font = `700 36px ${FONT}`; g.fillStyle = '#ffd33d'; g.fillText(String(s.rating), cx, cy - 2);
+      g.font = `500 26px ${BODY}`; g.fillStyle = '#fff'; g.fillText(s.name.length > 11 ? s.name.slice(0, 10) + '…' : s.name, cx, cy + 28);
+    }
+    if (card.pitch.caption) { g.font = `500 34px ${BODY}`; outlined(card.pitch.caption, W / 2, py + ph + 64, '#fff', 3); }
+  }
+  g.font = `500 38px ${BODY}`; outlined(CONFIG.siteUrl.replace(/^https?:\/\//, ''), W / 2, H - 44, '#ffd33d', 3);
+  return c;
+}
+
+// Smartphone: Teilen-Dialog mit Bild + Text + Link (WhatsApp zeigt den Link an). Desktop: Bild bzw. Text in die Zwischenablage.
+async function shareResult(text, card, btn) {
+  const full = text + '\n' + CONFIG.siteUrl;
+  const touch = matchMedia('(pointer: coarse)').matches;
+  let file = null;
+  try { await document.fonts.load('20px Digits', '0123456789'); } catch { /* egal */ }
+  try {
+    const blob = await new Promise(res => drawShareCard(card).toBlob(res, 'image/png'));
+    file = new File([blob], 'soccerdle.png', { type: 'image/png' });
+  } catch { /* ohne Bild weiter */ }
+  try {
+    if (touch && file && navigator.canShare && navigator.canShare({ files: [file] })) { await navigator.share({ files: [file], text: full }); return; }
+    if (touch && navigator.share) { await navigator.share({ text: full }); return; }
+  } catch (e) { if (e && e.name === 'AbortError') return; }
+  const done = t => { if (btn) btn.textContent = t; };
+  try {
+    if (file && window.ClipboardItem && navigator.clipboard.write) {
+      await navigator.clipboard.write([new ClipboardItem({ 'image/png': file, 'text/plain': new Blob([full], { type: 'text/plain' }) })]); done('Bild kopiert ✓'); return;
+    }
+  } catch { /* Fallback Text */ }
+  try { await navigator.clipboard.writeText(full); done('Text kopiert ✓'); } catch { /* egal */ }
+}
+// Aus dem Share-Text eine einfache Karte bauen: 1. Zeile = Ergebnis, weitere Zeilen = Emoji-Raster
+function cardFromText(text, mode) {
+  const [first, ...rest] = text.split('\n');
+  return { mode, big: first.replace(/^Soccerdle\s+[^\d⚽❌⭐]*/i, '').trim() || first, sub: '', lines: rest.filter(Boolean) };
+}
+
 /* ---------- Icons ---------- */
 const ICON = {
   pitch(active) {
-    const zones = [['TW', 0, 9], ['ABW', 9, 17], ['MF', 26, 18], ['ST', 44, 16]];
-    return `<svg class="ico-pitch" viewBox="0 0 60 40" aria-hidden="true">
-      ${zones.map(([z, x, w]) => `<rect x="${x}" y="0" width="${w}" height="40" class="${active.includes(z) ? 'on' : ''}"/>`).join('')}
-      <rect x="0.75" y="0.75" width="58.5" height="38.5" class="line"/><line x1="30" y1="0" x2="30" y2="40" class="line"/>
-      <circle cx="30" cy="20" r="6" class="line"/><rect x="0.75" y="11" width="7" height="18" class="line"/></svg>`;
+    const zones = [['TW', 4, 8], ['ABW', 15, 14], ['MF', 32, 14], ['ST', 49, 11]];   // Tor links, Angriff rechts
+    return `<svg class="ico-pitch" viewBox="0 0 64 36" shape-rendering="crispEdges" aria-hidden="true">
+      <rect x="0" y="0" width="64" height="36" fill="#14172b"/>
+      ${zones.map(([z, x, w]) => `<rect x="${x}" y="4" width="${w}" height="28" fill="${active.includes(z) ? '#ffffff' : '#39406a'}"/>`).join('')}
+      <rect x="29" y="4" width="2" height="28" fill="#14172b" opacity=".35"/>
+      <rect x="0" y="13" width="2" height="10" fill="#ffd33d"/><rect x="62" y="13" width="2" height="10" fill="#ffd33d"/></svg>`;
   },
   feet(f) {
     const sole = 'M10 2 C15 2 17 8 16 15 C15 22 14 26 14 31 C14 35 12 38 9 38 C6 38 4 35 4 31 C4 25 3 20 4 13 C5 6 6 2 10 2 Z';
@@ -87,7 +219,7 @@ const ICON = {
       <path d="${sole}" transform="translate(21 0) scale(-1 1)" class="${on('L')}"/><path d="${sole}" transform="translate(22 0)" class="${on('R')}"/></svg>`;
   },
   // Nur bekannte FIFA-Codes (Wikidata liefert z. B. "GBR" für britische Staatsbürgerschaft -> keine Flagge statt Kürzel)
-  flag: code => COUNTRIES[code] ? `<img class="flag" src="flags/${encodeURIComponent(code)}.svg" alt="" loading="lazy"
+  flag: code => COUNTRIES[code] ? `<img class="flag" src="flags/${encodeURIComponent(FLAG_FILE[code] || code)}.svg" alt="" loading="lazy"
     onerror="this.outerHTML='<span class=&quot;flag-fallback&quot;>${esc(code)}</span>'">` : '',
   up: '<svg class="dir" viewBox="0 0 24 24" aria-label="höher"><path d="M12 20V5M5 11l7-7 7 7"/></svg>',
   down: '<svg class="dir" viewBox="0 0 24 24" aria-label="niedriger"><path d="M12 4v15M5 13l7 7 7-7"/></svg>',
@@ -99,6 +231,10 @@ const ICON = {
 
 /* ---------- Daten ---------- */
 const DATA = window.SOCCERDLE_DATA || { players: [], updated: '?' };
+// Ligen mit eigenem Namen (nach Land des Vereins); alle anderen = "Andere". Hier erweitern/kürzen.
+const countryName2 = code => (COUNTRIES[code] || [code || '?'])[0];   // vor ICON/CONFIG-Nutzung verfügbar
+const NAMED_LEAGUES = { ENG: 'Premier League', ESP: 'LaLiga', ITA: 'Serie A', GER: 'Bundesliga', FRA: 'Ligue 1', KSA: 'Saudi Pro League', USA: 'MLS' };
+for (const p of DATA.players) p.league = NAMED_LEAGUES[p.leagueCountry] || 'Andere';
 const PLAYERS = [...DATA.players].sort((a, b) => (b.pageviews || 0) - (a.pageviews || 0)); // Index = Rang
 const BY_ID = new Map(PLAYERS.map(p => [p.id, p]));
 const DUP_NAMES = (() => { // gleiche Namen -> Verein in der Suche dazuschreiben
@@ -148,16 +284,16 @@ function numeric(g, t, near, unit) {
 
 const COLUMNS = [
   {
-    // Top-5-Ligen mit Namen. Alle anderen zählen als Gruppe "Andere":
-    // Spielen Tipp UND Gesuchter beide außerhalb der Top 5 -> grün (genaue Liga wird nicht verraten).
+    // Ligen aus NAMED_LEAGUES mit Namen, alle anderen zählen als Gruppe "Andere":
+    // Spielen eingegebener UND gesuchter Spieler beide in einer "anderen" Liga -> grün (genaue Liga wird nicht verraten).
     label: 'Liga', cmp: (g, t) => {
       const hit = g.league === t.league, other = g.league === 'Andere';
       return {
         status: hit ? 'hit' : 'miss', arrow: '',
-        main: `<span class="league">${esc(g.league)}</span>`, sub: '',
+        main: `<span class="league${g.league.length >= 10 && !g.league.includes(' ') ? ' long' : ''}">${esc(g.league)}</span>`, sub: '',
         tip: other ? (hit
-          ? 'Keine Top-5-Liga. Der Gesuchte spielt auch außerhalb der Top 5 – ob in derselben Liga, wird nicht verraten.'
-          : 'Keine Top-5-Liga.') : null,
+          ? '„Andere“ = Liga außerhalb der Top 5 (Saudi Pro League und MLS stehen extra). Der gesuchte Spieler spielt auch in so einer Liga – in welcher, bleibt geheim.'
+          : '„Andere“ = Liga außerhalb der Top 5 (Saudi Pro League und MLS stehen extra). Der gesuchte Spieler spielt nicht in so einer Liga.') : null,
       };
     },
   },
@@ -221,6 +357,13 @@ function poolFor(mode) {
 }
 const dailyKey = () => 'soccerdle-daily-' + todayStr();
 const puzzleNumber = () => dayDiff(CONFIG.launchDate, todayStr()) + 1;
+// Gestriges Tagesrätsel (gleiche Formel wie startDaily, ohne Server)
+function yesterdayTarget() {
+  const y = new Date(Date.parse(todayStr() + 'T00:00:00Z') - 86400000).toISOString().slice(0, 10);
+  if (y < CONFIG.launchDate) return null;
+  const pool = poolFor('daily');
+  return pool[hashStr('soccerdle:' + y) % pool.length] || null;
+}
 
 function startDaily() {
   const pool = poolFor('daily');
@@ -304,14 +447,14 @@ function giveUp() {
 /* ---------- Darstellung ---------- */
 function chipHtml(label, cell, extraClass = '') {
   const solo = cell.sub ? '' : ' solo';
+  const vlen = (cell.sub || '').replace(/<[^>]*>|&[a-z]+;/g, '').length, vcls = vlen >= 11 ? ' vxs' : vlen >= 9 ? ' vs' : '';   // lange Länder (Deutschland) etwas kleiner, damit sie in die Leiste passen
   const tipAttr = cell.tip ? ' data-tip tabindex="0"' : '';
   return `<div class="chip ${cell.status}${solo}${extraClass}"${tipAttr} aria-label="${esc(label)}">
-    <span class="k">${esc(label)}</span><span class="main">${cell.main}</span><span class="v">${cell.sub || '&nbsp;'}</span>
+    <span class="k">${esc(label)}</span><span class="main">${cell.main}</span><span class="v${vcls}">${cell.sub || '&nbsp;'}</span>
     ${cell.tip ? ICON.info + `<span class="tip">${esc(cell.tip)}</span>` : ''}</div>`;
 }
 
 function render({ animateLast = false } = {}) {
-  $('#season').textContent = CONFIG.season;
   $('#data-date').textContent = DATA.updated;
   $('#endless-bar').hidden = state.mode !== 'endless';
   $('#btn-giveup').hidden = state.done;
@@ -321,6 +464,8 @@ function render({ animateLast = false } = {}) {
 
   const n = state.guesses.length;
   const tries = `${n} ${n === 1 ? 'Versuch' : 'Versuche'}`;
+  const yEl = $('#yesterday'), yt = state.mode === 'daily' ? yesterdayTarget() : null;
+  yEl.hidden = !yt; if (yt) yEl.innerHTML = 'Gestern gesucht: <b>' + esc(yt.name) + '</b>';
   $('#play-title').textContent = state.mode === 'daily' ? `Rätsel #${puzzleNumber()}`
     : state.mode === 'test' ? 'Test-Rätsel' : 'Endlos';
   $('#play-count').textContent = state.done
@@ -445,7 +590,7 @@ function shareText() {
   const n = state.guesses.length;
   const res = state.won ? `⚽ ${n} ${n === 1 ? 'Versuch' : 'Versuche'}` : '❌ aufgegeben';
   const hints = state.usedHints.length ? ' ' + '💡'.repeat(state.usedHints.length) : '';
-  return `${head} ${res}${hints}${state.usedAssist ? ' 🛟' : ''}\n${grid}\n${location.href.startsWith('http') ? location.origin + location.pathname : ''}`.trim();
+  return `${head} ${res}${hints}${state.usedAssist ? ' 🛟' : ''}\n${grid}`.trim();
 }
 
 function showResult() {
@@ -466,12 +611,14 @@ function showResult() {
     ${state.mode === 'endless' ? '<button class="secondary" id="btn-again">Nächster Spieler</button>' : ''}
     ${state.mode === 'test' ? '<button class="secondary" id="btn-again-test">Neues Rätsel (Test)</button>' : ''}
     <form method="dialog"><button class="secondary">Schließen</button></form>`;
-  dlg.querySelector('#btn-share').onclick = async e => {
-    const text = shareText();
-    try {
-      if (navigator.share && matchMedia('(pointer: coarse)').matches) await navigator.share({ text });
-      else { await navigator.clipboard.writeText(text); e.target.textContent = 'Kopiert ✓'; }
-    } catch { /* abgebrochen */ }
+  dlg.querySelector('#btn-share').onclick = e => {
+    const n = state.guesses.length;
+    shareResult(shareText(), {
+      mode: state.mode === 'daily' ? 'Klassik · Rätsel #' + puzzleNumber() : 'Klassik',
+      big: state.won ? `⚽ ${n} ${n === 1 ? 'Versuch' : 'Versuche'}` : '❌ aufgegeben',
+      sub: state.usedHints.length ? '💡'.repeat(state.usedHints.length) + ' Hinweise genutzt' : '',
+      grid: rows.map(r => r.map(c => c.status)),
+    }, e.target);
   };
   const again = dlg.querySelector('#btn-again');
   if (again) again.onclick = () => { dlg.close(); startEndless(); render(); $('#search').focus(); };
@@ -557,7 +704,19 @@ $('#hints').addEventListener('click', e => {
   const btn = e.target.closest('[data-hint]');
   if (btn) toggleHint(Number(btn.dataset.hint));
 });
-$('#btn-help').addEventListener('click', () => $('#dlg-help').showModal());
+// Klassik-Anleitung (die der anderen Modi hängen als helpHtml an den Modi, siehe modes.js / draft.js)
+const NAMED_LIST = [...new Set(Object.values(NAMED_LEAGUES))].join(', ');
+$('#dlg-help').innerHTML = '<h2>Klassik</h2>' + HT.page('Errate den gesuchten Spieler aus der Champions League und weiteren Stars. Jeder Tipp färbt <b>7 Kacheln</b> – so siehst du, wie nah du dran bist.', [
+  { title: 'Spieler tippen', text: 'Jede Kachel vergleicht deinen Tipp mit dem gesuchten Spieler:',
+    art: '<div class="ex-row">' + HT.tile('Liga', 'Serie A', 'miss') + HT.tile('Nation', HT.flag('ESP'), 'near') + HT.tile('Pos.', 'MF', 'hit')
+      + HT.tile('Alter', '27 ↑', 'near') + HT.tile('Größe', '181 ↓', 'miss') + HT.tile('Fuß', 'Rechts', 'hit') + HT.tile('Nr.', '8', 'miss') + '</div>' + HT.legend() },
+  { title: 'Pfeile & Orange', text: 'Bei <b>Alter · Größe · Nr.</b> zeigt der Pfeil, ob der Gesuchte mehr ↑ oder weniger ↓ hat. Orange heißt knapp daneben (±2 Jahre, ±3 cm, ±3 Nummern). Bei <b>Nation</b> ist Orange der gleiche Kontinent, bei <b>Position</b> teilweise gleich, bei <b>Fuß</b> beidfüßig.' },
+  { title: 'Liga „Andere“', text: 'Diese Ligen haben einen eigenen Namen: ' + NAMED_LIST + '. Jede andere Liga heißt <b>„Andere“</b>. Steht bei deinem Tipp und beim gesuchten Spieler „Andere“, wird die Kachel grün – <b>welche</b> Liga, bleibt geheim.',
+    art: '<div class="ex-row ex-eq">' + HT.tile('eingegebener Spieler', 'Andere', 'unknown') + '<span class="ex-op">+</span>' + HT.tile('gesuchter Spieler', 'Andere', 'unknown') + '<span class="ex-op">=</span>' + HT.tile('Liga', 'Andere', 'hit') + '</div>' },
+  { title: 'Hinweise', text: 'Nach <b>3, 5, 7 und 10</b> Fehlversuchen werden Hinweise freigeschaltet. Aufdecken per Klick – benutzte Hinweise zeigt 💡 beim Teilen.',
+    art: '<div class="ex-row"><span class="ex-chip">' + ICON.lock + ' 3</span><span class="ex-chip">' + ICON.lock + ' 5</span><span class="ex-chip">' + ICON.lock + ' 7</span><span class="ex-chip">' + ICON.lock + ' 10</span></div>' },
+]) + '<form method="dialog"><button class="primary">Los geht’s</button></form>';
+$('#btn-help').addEventListener('click', () => { const g = window.currentGame; if (g && g !== 'classic' && typeof GAMES !== 'undefined' && GAMES[g] && GAMES[g].helpHtml) showModeHelp(g); else $('#dlg-help').showModal(); });
 $('#btn-stats').addEventListener('click', showStats);
 $('#btn-theme').addEventListener('click', toggleTheme);
 

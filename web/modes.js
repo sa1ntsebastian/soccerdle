@@ -8,8 +8,8 @@
 
 const MODE_CONFIG = {
   career:  { minSl: 60, minStations: 3, hints: [3, 5, 7] },
-  grid:    { attempts: 9, minAnswers: 3, topClubs: 50, answerMinSl: 25 },
-  mates:   { minSl: 60, clueMinSl: 35, startClues: 3, maxClues: 6, hints: [4, 6, 8] },
+  grid:    { attempts: 9, minAnswers: 3, topClubs: 50, answerMinSl: 25, rerolls: 2, earnRerollAt: 3 },   // 2 Rerolls von Anfang an, 1 weiterer ab 3 gelösten Feldern
+  mates:   { minSl: 60, clueMinSl: 50, topClubs: 70, minClubs: 3, perClub: 2, startClues: 3, maxClues: 6, hints: [4, 6, 8] },   // Mitspieler nur von bekannten Vereinen, höchstens 2 je Verein, mind. 3 Vereine
   lineup:  { hints: [2, 4, 6] },
 };
 
@@ -18,10 +18,10 @@ const HIST = (() => {
   const raw = window.SOCCERDLE_HISTORY;
   if (!raw) return { players: [], clubs: [], byId: new Map() };
   const clubs = raw.clubs.map(([name, country]) => ({ name, country }));
-  const players = raw.players.map(([id, name, dob, nat, pos, sl, flat, detail]) => {
+  const players = raw.players.map(([id, name, dob, nat, pos, sl, flat, detail, alt]) => {
     const career = [];
     for (let i = 0; i < flat.length; i += 4) career.push({ c: flat[i], f: flat[i + 1] || null, t: flat[i + 2] || null, loan: !!flat[i + 3] });
-    return { id, name, dob: dob || null, nat: nat || null, pos: pos ? pos.split(',') : [], sl, career, detail: detail || null };
+    return { id, name, dob: dob || null, nat: nat || null, pos: pos ? pos.split(',') : [], sl, career, detail: detail || null, alt: alt ? alt.split(',') : [] };
   });
   return { players, clubs, byId: new Map(players.map(p => [p.id, p])), model: raw.ratingModel || null, adjust: raw.ratingAdjust || {} };
 })();
@@ -131,13 +131,8 @@ function hintsHtml(defs, misses, revealed, done) {
   }).join('')}</div>`;
 }
 
-function shareButton(text) {
-  return async e => {
-    try {
-      if (navigator.share && matchMedia('(pointer: coarse)').matches) await navigator.share({ text });
-      else { await navigator.clipboard.writeText(text); e.target.textContent = 'Kopiert ✓'; }
-    } catch { /* abgebrochen */ }
-  };
+function shareButton(text, card) {   // Bild + Text + Link, siehe shareResult (app.js)
+  return e => shareResult(text, card || cardFromText(text, 'Soccerdle'), e.target);
 }
 
 /* ---------- Rahmen für einen Modus: Zustand, Speicherung, Test-Rätsel ---------- */
@@ -152,6 +147,7 @@ function makeMode(key, impl) {
       const saved = this.test ? null : store.get(this.storeKey(), null);
       this.s = Object.assign(impl.freshState(this.puzzle), saved || {});
       this.render();
+      maybeShowModeHelp(key);
     },
     save() { if (!this.test) store.set(this.storeKey(), this.s); updateDoneDots(); },
     newTest() { this.test = 'test:' + Math.random(); this.start(this.root); },
@@ -174,7 +170,7 @@ function makeMode(key, impl) {
         this.save(); this.render();
       });
       r.querySelectorAll('[data-act="giveup"]').forEach(b => b.onclick = () => { this.s.done = true; this.s.won = false; this.save(); this.render(); });
-      r.querySelectorAll('[data-act="share"]').forEach(b => b.onclick = shareButton(impl.shareText.call(this)));
+      r.querySelectorAll('[data-act="share"]').forEach(b => b.onclick = (txt => shareButton(txt, cardFromText(txt, this.helpTitle || this.key)))(impl.shareText.call(this)));
     },
     isDone() { const s = store.get(this.storeKey(), null); return !!(s && s.done); },
   };
@@ -252,44 +248,103 @@ const CareerMode = makeMode('career', {
 /* =========================================================================
    2) RASTER – 3×3: Spieler, die für Zeilen- UND Spaltenverein gespielt haben
    ========================================================================= */
+let GRID_POOL = null;
+function gridPool() {   // große Vereine + Spieler-Mengen (einmal berechnet)
+  if (GRID_POOL) return GRID_POOL;
+  const c = MODE_CONFIG.grid;
+  // Nur die großen Vereine: die mit den meisten sehr bekannten Spielern (Top N)
+  const count = new Map();
+  for (const p of HIST.players) if (p.sl >= 60) for (const ci of new Set(p.career.map(s => s.c))) count.set(ci, (count.get(ci) || 0) + 1);
+  const ranked = [...count.entries()].sort((a, b) => b[1] - a[1]).map(([ci]) => ci);   // alle Vereine, bekannteste zuerst
+  const bigClubs = ranked.slice(0, c.topClubs);
+  // Vorab: Verein -> Menge der (ausreichend bekannten) Spieler-IDs
+  const members = new Map(bigClubs.map(ci => [ci, new Set()]));
+  for (const p of HIST.players) if (p.sl >= c.answerMinSl) for (const st of p.career) if (members.has(st.c)) members.get(st.c).add(p.id);
+  const answers = (a, b) => { let n = 0; for (const id of members.get(a)) if (members.get(b).has(id)) n++; return { length: n }; };
+  GRID_POOL = { bigClubs, ranked, members, answers };
+  return GRID_POOL;
+}
+// Lösung mit lauter verschiedenen Spielern (ein Spieler darf nur in einem Feld stehen): bipartites Matching Felder -> Spieler.
+// Bekannteste Spieler zuerst. "fixed": Felder, die schon gelöst sind (Spieler dort gesperrt), "skip": diese Felder nicht belegen.
+function gridSolve(rows, cols, fixed = []) {
+  const { members } = gridPool(), taken = new Set(fixed.filter(Boolean));
+  const slOf = id => (HIST.byId.get(id) || { sl: 0 }).sl;
+  const cand = [];
+  for (let i = 0; i < 9; i++) {
+    if (fixed[i]) { cand.push(null); continue; }
+    const a = members.get(rows[Math.floor(i / 3)]), b = members.get(cols[i % 3]), list = [];
+    for (const id of a) if (b.has(id) && !taken.has(id)) list.push(id);
+    cand.push(list.sort((x, y) => slOf(y) - slOf(x)));
+  }
+  const owner = new Map();                       // Spieler -> Feld
+  const tryCell = (i, seen) => {
+    for (const id of cand[i]) {
+      if (seen.has(id)) continue; seen.add(id);
+      if (!owner.has(id) || tryCell(owner.get(id), seen)) { owner.set(id, i); return true; }
+    }
+    return false;
+  };
+  let ok = true;
+  for (let i = 0; i < 9; i++) if (cand[i] && !tryCell(i, new Set())) ok = false;
+  const sol = Array(9).fill(null); for (const [id, i] of owner) sol[i] = id;
+  return { ok, sol };
+}
+
 const GridMode = makeMode('grid', {
   generate(r) {
     const c = MODE_CONFIG.grid;
-    // Nur die großen Vereine: die mit den meisten sehr bekannten Spielern (Top N)
-    const count = new Map();
-    for (const p of HIST.players) if (p.sl >= 60) for (const ci of new Set(p.career.map(s => s.c))) count.set(ci, (count.get(ci) || 0) + 1);
-    const bigClubs = [...count.entries()].sort((a, b) => b[1] - a[1]).slice(0, c.topClubs).map(([ci]) => ci);
-    // Vorab: Verein -> Menge der (ausreichend bekannten) Spieler-IDs
-    const members = new Map(bigClubs.map(ci => [ci, new Set()]));
-    for (const p of HIST.players) if (p.sl >= c.answerMinSl) for (const st of p.career) if (members.has(st.c)) members.get(st.c).add(p.id);
-    const answers = (a, b) => { let n = 0; for (const id of members.get(a)) if (members.get(b).has(id)) n++; return { length: n }; };
+    const { bigClubs, answers } = gridPool();
     for (let tries = 0; tries < 4000; tries++) {
       const six = shuffle(bigClubs, r).slice(0, 6);
       const rows = six.slice(0, 3), cols = six.slice(3);
       let ok = true;
       for (const a of rows) { for (const b of cols) { if (answers(a, b).length < c.minAnswers) { ok = false; break; } } if (!ok) break; }
-      if (ok) return { rows, cols };
+      if (ok && gridSolve(rows, cols).ok) return { rows, cols };   // es gibt immer eine Lösung mit 9 verschiedenen Spielern
     }
     return null;
   },
-  freshState: () => ({ cells: Array(9).fill(null), wrong: 0, used: 0, done: false, won: false, active: null, revealed: [], usedHints: [] }),
+  freshState: () => ({ cells: Array(9).fill(null), wrong: 0, used: 0, done: false, won: false, active: null, revealed: [], usedHints: [],
+    rerolls: MODE_CONFIG.grid.rerolls, rerollsUsed: 0, earned: false, swaps: {} }),
+  // Überschriften inkl. Rerolls (swaps: "r0".."r2" / "c0".."c2" -> neuer Verein)
+  heads() {
+    const sw = this.s.swaps || {};
+    return { rows: this.puzzle.rows.map((x, i) => sw['r' + i] != null ? sw['r' + i] : x), cols: this.puzzle.cols.map((x, i) => sw['c' + i] != null ? sw['c' + i] : x) };
+  },
+  reroll(key) {   // einen Verein der Überschrift ersetzen (nur wenn in dieser Zeile/Spalte noch nichts gelöst ist)
+    const s = this.s, { rows, cols } = this.heads();
+    if (s.done || s.rerolls <= 0) return;
+    const isRow = key[0] === 'r', i = Number(key[1]);
+    const line = isRow ? [0, 1, 2].map(k => i * 3 + k) : [0, 1, 2].map(k => k * 3 + i);
+    if (line.some(ix => s.cells[ix])) return;
+    const { bigClubs, answers } = gridPool(), six = new Set(rows.concat(cols)), opp = isRow ? cols : rows;
+    const cand = bigClubs.filter(ci => !six.has(ci) && opp.every(o => answers(ci, o).length >= MODE_CONFIG.grid.minAnswers)
+      && gridSolve(isRow ? rows.map((x, k) => k === i ? ci : x) : rows, isRow ? cols : cols.map((x, k) => k === i ? ci : x), s.cells.map(id => id || null)).ok);
+    if (!cand.length) return;
+    const r = this.test ? Math.random : rng(`soccerdle:grid:reroll:${todayStr()}:${s.rerollsUsed}`);
+    s.swaps = Object.assign({}, s.swaps, { [key]: pickOne(cand, r) });
+    s.rerolls--; s.rerollsUsed++;
+    if (s.active != null && line.includes(s.active)) s.active = null;
+    this.save(); this.render();
+  },
   shareText() {
     const s = this.s, n = s.cells.filter(Boolean).length;
     const g = [0, 1, 2].map(r => [0, 1, 2].map(c => s.cells[r * 3 + c] ? '🟩' : '⬛').join('')).join('\n');
     return `Soccerdle Raster ${n}/9\n${g}`;
   },
   render() {
-    const { rows, cols } = this.puzzle, s = this.s, c = MODE_CONFIG.grid;
+    const { rows, cols } = this.heads(), s = this.s, c = MODE_CONFIG.grid;
     const left = c.attempts - s.used;
-    const head = idx => `<div class="g-head">${clubFlag(idx)}<span>${esc(clubName(idx))}</span></div>`;
-    let grid = `<div class="g-corner"><b>${left}</b><span>Versuche</span></div>${cols.map(head).join('')}`;
+    const solved = s.done ? gridSolve(rows, cols, s.cells) : null;   // Lösungsvorschlag für offene Felder (ohne doppelte Spieler)
+    const canRoll = key => { if (s.done || s.rerolls <= 0) return false; const i = Number(key[1]); return ![0, 1, 2].some(k => s.cells[key[0] === 'r' ? i * 3 + k : k * 3 + i]); };
+    const head = (idx, key) => `<div class="g-head">${clubFlag(idx)}<span>${esc(clubName(idx))}</span>${canRoll(key) ? `<button class="g-roll" data-reroll="${key}" title="Anderen Verein würfeln (Reroll)" aria-label="Reroll ${esc(clubName(idx))}">↻</button>` : ''}</div>`;
+    let grid = `<div class="g-corner"><b>${left}</b><span>Versuche</span><small>↻ ${s.rerolls} Reroll${s.rerolls === 1 ? '' : 's'}</small></div>${cols.map((x, i) => head(x, 'c' + i)).join('')}`;
     rows.forEach((ri, r) => {
-      grid += head(ri);
+      grid += head(ri, 'r' + r);
       cols.forEach((ci, k) => {
         const i = r * 3 + k, id = s.cells[i];
         if (id) grid += `<div class="g-cell filled"><span>${esc(UNIVERSE.byId.get(id).name)}</span></div>`;
         else if (s.done) {
-          const sol = HIST.players.filter(p => p.sl >= c.answerMinSl && playedFor(p, ri) && playedFor(p, ci)).sort((a, b) => b.sl - a.sl)[0];
+          const sol = solved.sol[i] ? HIST.byId.get(solved.sol[i]) : null;
           grid += `<div class="g-cell missed"><span>${sol ? esc(sol.name) : '–'}</span></div>`;
         } else grid += `<button class="g-cell${s.active === i ? ' active' : ''}" data-cell="${i}" aria-label="${esc(clubName(ri))} und ${esc(clubName(ci))}">+</button>`;
       });
@@ -316,18 +371,25 @@ const GridMode = makeMode('grid', {
         s.used++;
         const ok = p && playedFor(p, ri) && playedFor(p, ci);
         if (ok) { s.cells[s.active] = id; s.active = null; } else s.wrong++;
+        let bonus = false;
+        if (ok && !s.earned && s.cells.filter(Boolean).length >= c.earnRerollAt) { s.earned = true; s.rerolls++; bonus = true; }
         if (s.used >= c.attempts || s.cells.every(Boolean)) { s.done = true; s.won = s.cells.every(Boolean); }
         this.save(); this.render();
         if (!ok) this.root.querySelector('#g-feedback').textContent = `✗ ${UNIVERSE.byId.get(id).name} passt nicht.`;
+        else if (bonus) this.root.querySelector('#g-feedback').textContent = '🎉 Bonus: ein dritter Reroll ist freigeschaltet!';
       },
     });
     if (s.done) search.setDisabled(true, 'Fertig – morgen gibt es ein neues Raster');
     else if (s.active == null) search.setDisabled(false, 'Erst ein Feld wählen …');
     else search.focus();
     this.root.querySelectorAll('[data-cell]').forEach(b => b.onclick = () => { s.active = Number(b.dataset.cell); this.render(); });
+    this.root.querySelectorAll('[data-reroll]').forEach(b => b.onclick = () => this.reroll(b.dataset.reroll));
     this.bind();
   },
 });
+
+GridMode.heads = GridMode.impl.heads;     // Hilfsmethoden müssen am Modus hängen (render läuft mit this = Modus)
+GridMode.reroll = GridMode.impl.reroll;
 
 /* =========================================================================
    3) MITSPIELER – mit wem haben diese Spieler alle zusammengespielt?
@@ -336,22 +398,23 @@ const MatesMode = makeMode('mates', {
   generate(r) {
     const c = MODE_CONFIG.mates;
     const known = HIST.players.filter(p => p.sl >= c.clueMinSl && p.career.every(s => s.f));
+    const clubSet = new Set(gridPool().ranked.slice(0, c.topClubs));   // nur Stationen bei bekannten Vereinen zählen
     const targets = shuffle(HIST.players.filter(p => p.sl >= c.minSl && p.career.length >= 2 && p.career.every(s => s.f)), r);
     for (const t of targets.slice(0, 300)) {
       // Mitspieler sammeln, pro Verein die bekanntesten, gemischt über Vereine
       const byClub = new Map();
       for (const q of known) {
         if (q.id === t.id) continue;
-        const sh = sharedStints(t, q);
+        const sh = sharedStints(t, q).filter(x => clubSet.has(x.c));
         if (!sh.length) continue;
         const st = sh[0];
         if (!byClub.has(st.c)) byClub.set(st.c, []);
         byClub.get(st.c).push({ id: q.id, sl: q.sl, c: st.c, f: st.f, t: st.t });
       }
-      if (byClub.size < 2) continue;
+      if (byClub.size < c.minClubs) continue;
       const lists = [...byClub.values()].map(l => l.sort((a, b) => b.sl - a.sl));
       const clues = [];
-      for (let round = 0; clues.length < c.maxClues && round < 6; round++) for (const l of lists) if (l[round] && clues.length < c.maxClues) clues.push(l[round]);
+      for (let round = 0; clues.length < c.maxClues && round < c.perClub; round++) for (const l of lists) if (l[round] && clues.length < c.maxClues) clues.push(l[round]);
       if (clues.length < c.maxClues) continue;
       // Reihenfolge: schwer -> leicht (unbekanntere zuerst), aber erste drei aus verschiedenen Vereinen
       return { target: t.id, clues: shuffle(clues, r) };
@@ -517,6 +580,44 @@ const LineupMode = makeMode('lineup', {
    ========================================================================= */
 const GAMES = { career: CareerMode, grid: GridMode, mates: MatesMode, lineup: LineupMode };
 
+// Kurz-Anleitungen (max. 3–4 Punkte, mit Mini-Grafiken) – "?" zeigt die des offenen Modus, beim ersten Öffnen einmalig automatisch
+const exRow = (...x) => '<div class="ex-row">' + x.join('') + '</div>';
+const exGrid = (cols, rows, filled) => '<div class="ex-grid"><span></span>' + cols.map(c => '<b>' + c + '</b>').join('') + rows.map((r, i) => '<b>' + r + '</b>' + cols.map((c, k) => filled && filled[0] === i && filled[1] === k ? '<span class="ok">' + filled[2] + '</span>' : '<span>+</span>').join('')).join('') + '</div>';
+Object.assign(CareerMode, { helpTitle: 'Karriere', helpHtml: HT.page('Wessen Karriere ist das? Die Stationen zeigen dir den Weg des gesuchten Spielers.', [
+  { title: 'Stationen lesen', text: 'Links die Jahre, rechts der Verein – von den Anfängen bis heute.',
+    art: '<ul class="ex-tl"><li><i>2002–2007</i><span>Vitória Setúbal</span></li><li><i>2007–2008</i><span>Sporting Lissabon</span></li><li><i>2008–2013</i><span>Manchester United</span></li><li><i>2013–2018</i><span>Real Madrid</span></li></ul>' },
+  { title: 'Spieler tippen', text: 'War dein Tipp bei einem dieser Vereine auch, erscheint dort ein <b>✓</b> mit seinem Namen – so tastest du dich heran.',
+    art: '<ul class="ex-tl"><li class="shared"><i>2008–2013</i><span>Manchester United</span><em>✓ Rooney</em></li></ul>' },
+  { title: 'Hinweise', text: 'Nach einigen Fehlversuchen kannst du Nation, Position und Initialen aufdecken. Benutzte Hinweise zeigt 💡 beim Teilen.',
+    art: exRow('<span class="ex-chip">' + ICON.lock + ' 3</span>', '<span class="ex-chip">' + ICON.lock + ' 5</span>', '<span class="ex-chip">' + ICON.lock + ' 7</span>') },
+]) });
+Object.assign(GridMode, { helpTitle: 'Raster', helpHtml: HT.page('Fülle das 3×3-Raster: Jedes Feld braucht einen Spieler, der für den Verein der <b>Zeile</b> <u>und</u> den der <b>Spalte</b> gespielt hat.', [
+  { title: 'Feld wählen, Spieler nennen', text: 'Tippe ein Feld an und suche einen passenden Spieler. Jeder Spieler darf nur einmal vorkommen.',
+    art: exGrid(['Bayern', 'Real', 'Chelsea'], ['Dortmund', 'Barça', 'Inter'], [1, 0, 'Kroos']) },
+  { title: '9 Versuche', text: 'Jeder Tipp – richtig oder falsch – kostet einen Versuch. Du hast 9 Versuche für 9 Felder.',
+    art: exRow(HT.tile('Versuche', '9', 'unknown'), HT.tile('Felder', '9', 'unknown')) },
+  { title: 'Rerolls ↻', text: 'Mit <b>↻</b> an einer Überschrift tauschst du einen Verein aus (nur in Zeilen/Spalten ohne gelöstes Feld, kostet keinen Versuch). Du startest mit <b>2 Rerolls</b> – den <b>3.</b> verdienst du mit 3 gelösten Feldern.',
+    art: '<div class="ex-row"><span class="ex-head">FC Bayern <button class="g-roll" tabindex="-1">↻</button></span><span class="ex-chip">↻ 2 Rerolls</span></div>' },
+]) });
+Object.assign(MatesMode, { helpTitle: 'Mitspieler', helpHtml: HT.page('Wer hat mit <b>allen</b> diesen Spielern zusammengespielt?', [
+  { title: 'Mitspieler lesen', text: 'Du siehst Spieler mit Verein und Jahren. Gesucht ist, wer dort gleichzeitig im Team war.',
+    art: '<div class="ex-mates"><div><b>Zlatan Ibrahimović</b><small>AC Milan · 2010–2012</small></div><div><b>Gianluigi Buffon</b><small>Juventus · 2011–2018</small></div><div><b>Kylian Mbappé</b><small>PSG · 2017–2024</small></div><div class="q">?</div></div>' },
+  { title: 'Mehr Mitspieler', text: 'Nach jedem falschen Tipp kommt ein weiterer Mitspieler dazu – höchstens 6.',
+    art: exRow('<span class="ex-chip">3</span><span class="ex-op">→</span><span class="ex-chip">4</span><span class="ex-op">→</span><span class="ex-chip">5</span><span class="ex-op">→</span><span class="ex-chip">6</span>') },
+  { title: 'Mehrere Lösungen', text: 'Auch richtig: jeder Spieler, der mit <b>allen gezeigten</b> Spielern zusammengespielt hat – nicht nur der gesuchte.' },
+]) });
+Object.assign(LineupMode, { helpTitle: 'Wer fehlt?', helpHtml: HT.page('Die Startelf eines Finals steht auf dem Spielfeld – ein Spieler fehlt.', [
+  { title: 'Aufstellung ansehen', text: 'Auf dem Feld siehst du die Elf mit Namen. Eine Position ist leer.', art: htElf(2, '?') },
+  { title: 'Namen tippen', text: 'Wer fehlt? Die gesuchte Position steht über dem Feld, Wettbewerb und Jahr oben im Spiel.' },
+  { title: 'Hinweise', text: 'Nach Fehlversuchen werden Nation, Rückennummer und Initialen freigeschaltet.',
+    art: exRow('<span class="ex-chip">' + ICON.lock + ' 2</span>', '<span class="ex-chip">' + ICON.lock + ' 4</span>', '<span class="ex-chip">' + ICON.lock + ' 6</span>') },
+]) });
+function maybeShowModeHelp(game) {
+  const k = 'soccerdle-seen-help-' + game;
+  if (store.get(k, false) || !GAMES[game] || !GAMES[game].helpHtml) return;
+  store.set(k, true); showModeHelp(game);
+}
+
 function isClassicDoneToday() { const s = store.get('soccerdle-daily-' + todayStr(), null); return !!(s && s.done); }
 function updateDoneDots() {
   document.querySelectorAll('.game').forEach(b => {
@@ -529,7 +630,16 @@ function updateDoneDots() {
   });
 }
 
+// Kurz-Anleitung des Modus (GAMES[g].helpTitle + helpHtml) im Dialog zeigen
+function showModeHelp(game) {
+  const g = GAMES[game], dlg = document.getElementById('dlg-help-mode');
+  if (!g || !g.helpHtml || !dlg) return;
+  dlg.innerHTML = `<h2>${g.helpTitle || 'So funktioniert’s'}</h2>${g.helpHtml}<form method="dialog"><button class="primary">Los geht’s</button></form>`;
+  if (!dlg.open) dlg.showModal();
+}
+
 function showGame(game) {
+  window.currentGame = game;
   document.querySelectorAll('.game').forEach(b => b.classList.toggle('active', b.dataset.game === game));
   const classic = game === 'classic';
   document.getElementById('classic').hidden = !classic;

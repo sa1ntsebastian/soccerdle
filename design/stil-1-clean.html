@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Soccerdle – Stil 1: Clean</title>
+<link rel="stylesheet" href="stile-base.css">
+<style>
+  /* Stil 1 – minimalistisch/clean: viel Weißraum, Haarlinien, eine Akzentfarbe, flache Pastell-Kacheln */
+  :root { --bg: #fafaf8; --card: #fff; --text: #141414; --muted: #7a7a74; --line: #e8e7e2; --accent: #0b6b3a;
+    --hit: #cdeedb; --hit-ink: #0b4f2b; --near: #fbe7ae; --near-ink: #6a4a00; --miss: #f4d3cf; --miss-ink: #7d211a; }
+  body { background: var(--bg); color: var(--text); font: 15px/1.45 "Inter", system-ui, sans-serif; }
+  .muted { color: var(--muted); }
+  .top { padding: 28px 0 18px; }
+  .logo-mark svg { width: 30px; height: 30px; }
+  .wm { font-weight: 700; font-size: 22px; letter-spacing: -.03em; text-transform: lowercase; }
+  .w2 { color: var(--accent); }
+  .logo-txt small { color: var(--muted); font-size: 12px; margin-top: 1px; }
+  .tools button { border: 1px solid var(--line); background: var(--card); border-radius: 12px; color: var(--muted); }
+  .tools button:hover { color: var(--text); }
+  .tabs { border-bottom: 1px solid var(--line); gap: 0; }
+  .tabs button { color: var(--muted); padding: 12px 4px; border-bottom: 2px solid transparent; margin-bottom: -1px; flex-direction: row; justify-content: center; gap: 8px; }
+  .tabs button.on { color: var(--text); border-bottom-color: var(--accent); font-weight: 600; }
+  .tabs svg { width: 18px; height: 18px; }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 22px; }
+  .subtabs { background: #f1f0ec; border-radius: 10px; padding: 3px; }
+  .subtabs button { border: 0; background: none; border-radius: 8px; color: var(--muted); font-size: 13px; }
+  .subtabs .on { background: #fff; color: var(--text); box-shadow: 0 1px 2px rgba(0,0,0,.08); font-weight: 600; }
+  .play-top b { font-size: 20px; letter-spacing: -.02em; }
+  .yest { color: var(--muted); } .yest b { color: var(--text); font-weight: 600; }
+  .search { border: 1px solid var(--line); border-radius: 12px; background: #fff; color: var(--muted); }
+  .search:focus-within { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(11,107,58,.12); }
+  .hint { border: 1px solid var(--line); border-radius: 12px; color: var(--muted); }
+  .hint i { color: var(--muted); } .hint.open { background: #f1f8f3; border-color: #bfe3cd; color: var(--text); }
+  .hint.open b { font-size: 15px; }
+  .g-head em { color: var(--muted); font-weight: 500; text-transform: none; letter-spacing: 0; font-size: 12px; }
+  .g-row { border-top: 1px solid var(--line); }
+  .g-name b { font-weight: 600; } .g-name small { color: var(--muted); }
+  .t { border-radius: 10px; font-weight: 600; }
+  .t.hit { background: var(--hit); color: var(--hit-ink); } .t.near { background: var(--near); color: var(--near-ink); } .t.miss { background: var(--miss); color: var(--miss-ink); }
+  .g-row.win .g-name b { color: var(--accent); }
+  .legend { color: var(--muted); } .legend i { border-radius: 50%; }
+  .legend .hit { background: var(--hit); } .legend .near { background: var(--near); } .legend .miss { background: var(--miss); }
+  .d-score span { color: var(--muted); font-size: 13px; } .d-score b { font-size: 44px; font-weight: 700; letter-spacing: -.04em; }
+  .pitch { background: #eaf3ed; border: 1px solid #cfe3d6; border-radius: 14px; }
+  .pitch::before { content: ""; position: absolute; left: 0; right: 0; top: 50%; border-top: 1px solid #c3dccb; }
+  .pitch::after { content: ""; position: absolute; left: 50%; top: 50%; width: 22%; aspect-ratio: 1; translate: -50% -50%; border: 1px solid #c3dccb; border-radius: 50%; }
+  .slot.filled { background: #fff; border: 1px solid var(--line); border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,.06); }
+  .slot .r { color: var(--accent); font-weight: 700; } .slot small { color: var(--muted); }
+  .slot.empty { border: 1px dashed #9fc4ad; border-radius: 12px; color: #6f9c82; }
+  .slot.pend { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(11,107,58,.15); }
+  .acts .ok { background: var(--accent); color: #fff; } .acts .undo { background: #fff; border: 1px solid var(--line); }
+  .intro { color: var(--muted); } .intro b { color: var(--text); }
+  .offer { border: 1px solid var(--line); border-radius: 12px; }
+  .offer b { color: var(--accent); letter-spacing: -.02em; } .offer small { color: var(--muted); }
+  .offer.on { border-color: var(--accent); background: #f1f8f3; }
+  .pl { border: 1px solid var(--line); border-radius: 10px; } .pl em { color: var(--muted); } .pl b { color: var(--accent); }
+  footer { color: var(--muted); }
+</style>
+</head>
+<body>
+<div class="app" id="app"></div>
+<script src="stile.js"></script>
+<script>
+  renderMock(document.getElementById('app'), { logo: `<span class="logo-mark"><svg viewBox="0 0 32 32"><circle cx="16" cy="16" r="14" fill="none" stroke="#141414" stroke-width="2"/><path d="m16 9.5 5.5 4-2.1 6.5h-6.8l-2.1-6.5z" fill="#0b6b3a"/><path d="M16 9.5V3M21.5 13.5l6-2M19.4 20l4 5.3M12.6 20l-4 5.3M10.5 13.5l-6-2" stroke="#141414" stroke-width="2" fill="none"/></svg></span>` });
+</script>
+</body>
+</html>

@@ -5,11 +5,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Soccerdle</title>
   <meta name="description" content="Errate den Fußballspieler der Champions League – jeden Tag ein neues Rätsel.">
-  <meta name="theme-color" content="#1d6b3d">
+  <meta name="theme-color" content="#123524">
   <!-- Testphase: nicht in Suchmaschinen aufnehmen. VOR DEM LAUNCH ENTFERNEN. -->
   <meta name="robots" content="noindex, nofollow">
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><circle cx='12' cy='12' r='11' fill='%231f7a45'/><path d='M12 7l3.3 2.4-1.3 3.9h-4l-1.3-3.9z' fill='white'/></svg>">
-  <link rel="preload" href="fonts/barlow-condensed-700-latin.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20viewBox%3D'0%200%208%208'%20shape-rendering%3D'crispEdges'%3E%3Crect%20x%3D'2'%20y%3D'0'%20width%3D'1'%20height%3D'1'%20fill%3D'%2314172b'%2F%3E%3Crect%20x%3D'3'%20y%3D'0'%20width%3D'1'%20height%3D'1'%20fill%3D'%2314172b'%2F%3E%3Crect%20x%3D'4'%20y%3D'0'%20width%3D'1'%20height%3D'1'%20fill%3D'%2314172b'%2F%3E%3Crect%20x%3D'5'%20y%3D'0'%20width%3D'1'%20height%3D'1'%20fill%3D'%2314172b'%2F%3E%3Crect%20x%3D'1'%20y%3D'1'%20width%3D'1'%20height%3D'1'%20fill%3D'%2314172b'%2F%3E%3Crect%20x%3D'2'%20y%3D'1'%20width%3D'1'%20height%3D'1'%20fill%3D'%23fff'%2F%3E%3Crect%20x%3D'3'%20y%3D'1'%20width%3D'1'%20height%3D'1'%20fill%3D'%23fff'%2F%3E%3Crect%20x%3D'4'%20y%3D'1'%20width%3D'1'%20height%3D'1'%20fill%3D'%23fff'%2F%3E%3Crect%20x%3D'5'%20y%3D'1'%20width%3D'1'%20height%3D'1'%20fill%3D'%23fff'%2F%3E%3Crect%20x%3D'6'%20y%3D'1'%20width%3D'1'%20height%3D'1'%20fill%3D'%2314172b'%2F%3E%3Crect%20x%3D'0'%20y%3D'2'%20width%3D'1'%20height%3D'1'%20fill%3D'%2314172b'%2F%3E%3Crect%20x%3D'1'%20y%3D'2'%20width%3D'1'%20height%3D'1'%20fill%3D'%23fff'%2F%3E%3Crect%20x%3D'2'%20y%3D'2'%20width%3D'1'%20height%3D'1'%20fill%3D'%23fff'%2F%3E%3Crect%20x%3D'3'%20y%3D'2'%20width%3D'1'%20height%3D'1'%20fill%3D'%232f64d8'%2F%3E%3Crect%20x%3D'4'%20y%3D'2'%20width%3D'1'%20height%3D'1'%20fill%3D'%232f64d8'%2F%3E%3Crect%20x%3D'5'%20y%3D'2'%20width%3D'1'%20height%3D'1'%20fill%3D'%23fff'%2F%3E%3Crect%20x%3D'6'%20y%3D'2'%20width%3D'1'%20height%3D'1'%20fill%3D'%23fff'%2F%3E%3Crect%20x%3D'7'%20y%3D'2'%20width%3D'1'%20height%3D'1'%20fill%3D'%2314172b'%2F%3E%3Crect%20x%3D'0'%20y%3D'3'%20width%3D'1'%20height%3D'1'%20fill%3D'%2314172b'%2F%3E%3Crect%20x%3D'1'%20y%3D'3'%20width%3D'1'%20height%3D'1'%20fill%3D'%23fff'%2F%3E%3Crect%20x%3D'2'%20y%3D'3'%20width%3D'1'%20height%3D'1'%20fill%3D'%232f64d8'%2F%3E%3Crect%20x%3D'3'%20y%3D'3'%20width%3D'1'%20height%3D'1'%20fill%3D'%232f64d8'%2F%3E%3Crect%20x%3D'4'%20y%3D'3'%20width%3D'1'%20height%3D'1'%20fill%3D'%232f64d8'%2F%3E%3Crect%20x%3D'5'%20y%3D'3'%20width%3D'1'%20height%3D'1'%20fill%3D'%232f64d8'%2F%3E%3Crect%20x%3D'6'%20y%3D'3'%20width%3D'1'%20height%3D'1'%20fill%3D'%23fff'%2F%3E%3Crect%20x%3D'7'%20y%3D'3'%20width%3D'1'%20height%3D'1'%20fill%3D'%2314172b'%2F%3E%3Crect%20x%3D'0'%20y%3D'4'%20width%3D'1'%20height%3D'1'%20fill%3D'%2314172b'%2F%3E%3Crect%20x%3D'1'%20y%3D'4'%20width%3D'1'%20height%3D'1'%20fill%3D'%23fff'%2F%3E%3Crect%20x%3D'2'%20y%3D'4'%20width%3D'1'%20height%3D'1'%20fill%3D'%232f64d8'%2F%3E%3Crect%20x%3D'3'%20y%3D'4'%20width%3D'1'%20height%3D'1'%20fill%3D'%232f64d8'%2F%3E%3Crect%20x%3D'4'%20y%3D'4'%20width%3D'1'%20height%3D'1'%20fill%3D'%232f64d8'%2F%3E%3Crect%20x%3D'5'%20y%3D'4'%20width%3D'1'%20height%3D'1'%20fill%3D'%232f64d8'%2F%3E%3Crect%20x%3D'6'%20y%3D'4'%20width%3D'1'%20height%3D'1'%20fill%3D'%23fff'%2F%3E%3Crect%20x%3D'7'%20y%3D'4'%20width%3D'1'%20height%3D'1'%20fill%3D'%2314172b'%2F%3E%3Crect%20x%3D'0'%20y%3D'5'%20width%3D'1'%20height%3D'1'%20fill%3D'%2314172b'%2F%3E%3Crect%20x%3D'1'%20y%3D'5'%20width%3D'1'%20height%3D'1'%20fill%3D'%23fff'%2F%3E%3Crect%20x%3D'2'%20y%3D'5'%20width%3D'1'%20height%3D'1'%20fill%3D'%23fff'%2F%3E%3Crect%20x%3D'3'%20y%3D'5'%20width%3D'1'%20height%3D'1'%20fill%3D'%232f64d8'%2F%3E%3Crect%20x%3D'4'%20y%3D'5'%20width%3D'1'%20height%3D'1'%20fill%3D'%232f64d8'%2F%3E%3Crect%20x%3D'5'%20y%3D'5'%20width%3D'1'%20height%3D'1'%20fill%3D'%23fff'%2F%3E%3Crect%20x%3D'6'%20y%3D'5'%20width%3D'1'%20height%3D'1'%20fill%3D'%23fff'%2F%3E%3Crect%20x%3D'7'%20y%3D'5'%20width%3D'1'%20height%3D'1'%20fill%3D'%2314172b'%2F%3E%3Crect%20x%3D'1'%20y%3D'6'%20width%3D'1'%20height%3D'1'%20fill%3D'%2314172b'%2F%3E%3Crect%20x%3D'2'%20y%3D'6'%20width%3D'1'%20height%3D'1'%20fill%3D'%23fff'%2F%3E%3Crect%20x%3D'3'%20y%3D'6'%20width%3D'1'%20height%3D'1'%20fill%3D'%23fff'%2F%3E%3Crect%20x%3D'4'%20y%3D'6'%20width%3D'1'%20height%3D'1'%20fill%3D'%23fff'%2F%3E%3Crect%20x%3D'5'%20y%3D'6'%20width%3D'1'%20height%3D'1'%20fill%3D'%23fff'%2F%3E%3Crect%20x%3D'6'%20y%3D'6'%20width%3D'1'%20height%3D'1'%20fill%3D'%2314172b'%2F%3E%3Crect%20x%3D'2'%20y%3D'7'%20width%3D'1'%20height%3D'1'%20fill%3D'%2314172b'%2F%3E%3Crect%20x%3D'3'%20y%3D'7'%20width%3D'1'%20height%3D'1'%20fill%3D'%2314172b'%2F%3E%3Crect%20x%3D'4'%20y%3D'7'%20width%3D'1'%20height%3D'1'%20fill%3D'%2314172b'%2F%3E%3Crect%20x%3D'5'%20y%3D'7'%20width%3D'1'%20height%3D'1'%20fill%3D'%2314172b'%2F%3E%3C%2Fsvg%3E">
+  <link rel="preload" href="fonts/pixelify-sans.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="fonts/tiny5.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="style.css">
   <script>
     // Theme so früh wie möglich setzen (verhindert kurzes Aufblitzen)
@@ -19,10 +20,7 @@
 <body>
   <header class="hero">
     <div class="hero-inner">
-      <div class="logo">
-        <div class="logo-mark"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10" fill="#1f7a45"/><path d="M12 7l3.3 2.4-1.3 3.9h-4l-1.3-3.9z" fill="#fff"/><path d="M12 7V3.5M15.3 9.4l3.4-1.1M14 13.3l2.1 3.2M10 13.3l-2.1 3.2M8.7 9.4L5.3 8.3" stroke="#fff" stroke-width="1.3"/></svg></div>
-        <div><h1>Soccer<span>dle</span></h1><small id="season"></small></div>
-      </div>
+      <div class="logo"><h1 aria-label="Soccerdle">S<svg viewBox="0 0 8 8" shape-rendering="crispEdges" aria-hidden="true"><rect x="2" y="0" width="1" height="1" fill="#14172b"/><rect x="3" y="0" width="1" height="1" fill="#14172b"/><rect x="4" y="0" width="1" height="1" fill="#14172b"/><rect x="5" y="0" width="1" height="1" fill="#14172b"/><rect x="1" y="1" width="1" height="1" fill="#14172b"/><rect x="2" y="1" width="1" height="1" fill="#fff"/><rect x="3" y="1" width="1" height="1" fill="#fff"/><rect x="4" y="1" width="1" height="1" fill="#fff"/><rect x="5" y="1" width="1" height="1" fill="#fff"/><rect x="6" y="1" width="1" height="1" fill="#14172b"/><rect x="0" y="2" width="1" height="1" fill="#14172b"/><rect x="1" y="2" width="1" height="1" fill="#fff"/><rect x="2" y="2" width="1" height="1" fill="#fff"/><rect x="3" y="2" width="1" height="1" fill="#2f64d8"/><rect x="4" y="2" width="1" height="1" fill="#2f64d8"/><rect x="5" y="2" width="1" height="1" fill="#fff"/><rect x="6" y="2" width="1" height="1" fill="#fff"/><rect x="7" y="2" width="1" height="1" fill="#14172b"/><rect x="0" y="3" width="1" height="1" fill="#14172b"/><rect x="1" y="3" width="1" height="1" fill="#fff"/><rect x="2" y="3" width="1" height="1" fill="#2f64d8"/><rect x="3" y="3" width="1" height="1" fill="#2f64d8"/><rect x="4" y="3" width="1" height="1" fill="#2f64d8"/><rect x="5" y="3" width="1" height="1" fill="#2f64d8"/><rect x="6" y="3" width="1" height="1" fill="#fff"/><rect x="7" y="3" width="1" height="1" fill="#14172b"/><rect x="0" y="4" width="1" height="1" fill="#14172b"/><rect x="1" y="4" width="1" height="1" fill="#fff"/><rect x="2" y="4" width="1" height="1" fill="#2f64d8"/><rect x="3" y="4" width="1" height="1" fill="#2f64d8"/><rect x="4" y="4" width="1" height="1" fill="#2f64d8"/><rect x="5" y="4" width="1" height="1" fill="#2f64d8"/><rect x="6" y="4" width="1" height="1" fill="#fff"/><rect x="7" y="4" width="1" height="1" fill="#14172b"/><rect x="0" y="5" width="1" height="1" fill="#14172b"/><rect x="1" y="5" width="1" height="1" fill="#fff"/><rect x="2" y="5" width="1" height="1" fill="#fff"/><rect x="3" y="5" width="1" height="1" fill="#2f64d8"/><rect x="4" y="5" width="1" height="1" fill="#2f64d8"/><rect x="5" y="5" width="1" height="1" fill="#fff"/><rect x="6" y="5" width="1" height="1" fill="#fff"/><rect x="7" y="5" width="1" height="1" fill="#14172b"/><rect x="1" y="6" width="1" height="1" fill="#14172b"/><rect x="2" y="6" width="1" height="1" fill="#fff"/><rect x="3" y="6" width="1" height="1" fill="#fff"/><rect x="4" y="6" width="1" height="1" fill="#fff"/><rect x="5" y="6" width="1" height="1" fill="#fff"/><rect x="6" y="6" width="1" height="1" fill="#14172b"/><rect x="2" y="7" width="1" height="1" fill="#14172b"/><rect x="3" y="7" width="1" height="1" fill="#14172b"/><rect x="4" y="7" width="1" height="1" fill="#14172b"/><rect x="5" y="7" width="1" height="1" fill="#14172b"/></svg>CCER<span>DLE</span></h1></div>
       <div class="hero-actions">
         <button class="icon-btn" id="btn-theme" aria-label="Hell/Dunkel umschalten" title="Hell/Dunkel"><svg viewBox="0 0 24 24" id="theme-ico"></svg></button>
         <button class="icon-btn" id="btn-stats" aria-label="Statistik" title="Statistik"><svg viewBox="0 0 24 24"><path d="M5 20V10M12 20V4M19 20v-7"/></svg></button>
@@ -61,6 +59,7 @@
         </span>
       </div>
 
+      <p class="yesterday" id="yesterday" hidden></p>
       <div class="endless-bar" id="endless-bar" hidden>
         <label>Schwierigkeit
           <select id="difficulty">
@@ -109,26 +108,15 @@
 
   <dialog id="dlg-result" class="dialog"></dialog>
   <dialog id="dlg-stats" class="dialog"></dialog>
-  <dialog id="dlg-help" class="dialog">
-    <h2>So funktioniert's</h2>
-    <p>Errate den gesuchten Spieler aus der Champions League. Nach jedem Tipp zeigen die Kacheln, wie nah du dran bist.</p>
-    <div class="legend left">
-      <span><i class="hit"></i>richtig</span><span><i class="near"></i>knapp / teilweise</span><span><i class="miss"></i>falsch</span>
-    </div>
-    <ul class="rules">
-      <li><b>Liga</b> – Top-5-Ligen mit Namen, alle anderen als „Andere“. Bei „Andere“ heißt Grün: Der Gesuchte spielt auch außerhalb der Top 5 – ob in derselben Liga, wird nicht verraten.</li>
-      <li><b>Nation</b> – Nationalteam. Orange: gleicher Kontinentalverband.</li>
-      <li><b>Position</b> – Tor links, Angriff rechts. Orange: teilweise gleich (z. B. Abwehr + Mittelfeld).</li>
-      <li><b>Alter · Größe · Nr.</b> – Der Pfeil zeigt, ob der Gesuchte älter/größer/höher ↑ oder jünger/kleiner/niedriger ↓ ist. Orange: knapp daneben (±2 Jahre, ±3 cm, ±3 Nummern).</li>
-      <li><b>Fuß</b> – Orange: einer der beiden ist beidfüßig.</li>
-    </ul>
-    <p>Nach 4, 7 und 10 Fehlversuchen werden Hinweise freigeschaltet.</p>
-    <form method="dialog"><button class="primary">Los geht's</button></form>
-  </dialog>
+  <dialog id="dlg-help-mode" class="dialog"></dialog>
+  <dialog id="dlg-help" class="dialog"></dialog>
 
+  <script src="pixel.js"></script>
   <script src="data/players.js"></script>
   <script src="data/history.js"></script>
   <script src="data/lineups.js"></script>
+  <script src="data/nations.js"></script>
+  <script src="data/market.js"></script>
   <script src="app.js"></script>
   <script src="modes.js"></script>
   <script src="draft.js"></script>

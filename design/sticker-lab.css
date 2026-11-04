@@ -1,0 +1,94 @@
+/* Sticker-Album Labor: Varianten für Logo, Kopfbereich, Kachel-Glanz und "Voll-Sticker"-Optik, umschaltbar über data-Attribute am <html>. */
+body { overflow-x: hidden; padding-bottom: 120px; }
+.play-top b { text-shadow: 3px 3px 0 var(--title-shadow); }          /* Nacht: eigener Schattenton, damit "Rätsel #4" lesbar bleibt */
+.yest b { text-shadow: none; }
+
+/* ---------- Logos (5): alle im Header, sichtbar ist nur das gewählte ---------- */
+.logo .lg { display: none; align-items: center; gap: 12px; }
+html[data-logo="1"] .lg1, html[data-logo="2"] .lg2, html[data-logo="3"] .lg3, html[data-logo="4"] .lg4, html[data-logo="5"] .lg5 { display: flex; }
+.lg svg { display: block; }
+.lg .wm { margin: 0; line-height: 1; }
+.lg1 svg { width: 66px; height: 66px; transform: rotate(-8deg); filter: drop-shadow(3px 3px 0 var(--shadow)); margin: -6px 0; }
+/* 2: Ball ersetzt das O im Schriftzug */
+.lg2 .wm { font-size: 50px; display: inline-flex; align-items: center; }
+.lg2 .o-ball { width: .9em; height: .9em; margin: 0 .04em; transform: skew(6deg) rotate(-10deg); -webkit-text-stroke: 0; filter: drop-shadow(3px 3px 0 var(--shadow)); }
+/* 3: Banner mit Schwalbenschwanz-Enden */
+.lg3 .ribbon { background: var(--outline); padding: 4px 0; clip-path: polygon(0 0, 100% 0, calc(100% - 16px) 50%, 100% 100%, 0 100%, 16px 50%); filter: drop-shadow(4px 4px 0 var(--shadow)); }
+.lg3 .ribbon .in { background: var(--c1); color: #fff; font-family: var(--impact); font-style: italic; font-size: 34px; letter-spacing: .04em; padding: 4px 38px; clip-path: polygon(0 0, 100% 0, calc(100% - 15px) 50%, 100% 100%, 0 100%, 15px 50%); display: flex; align-items: center; gap: 12px; text-shadow: 3px 3px 0 rgba(0,0,0,.35); }
+.lg3 .ribbon i { font-style: normal; color: var(--c3); font-size: 22px; }
+/* 4: Trikot mit 26 */
+.lg4 svg { width: 70px; height: 66px; filter: drop-shadow(3px 3px 0 var(--shadow)); margin: -4px 0; }
+.lg4 .wm { font-size: 40px; }
+/* 5: runder Die-Cut-Sticker + gestapelter Schriftzug */
+.lg5 .disc { width: 74px; height: 74px; border-radius: 50%; background: var(--c3); border: 5px solid #fff; box-shadow: 0 0 0 2px #111, 3px 5px 0 2px rgba(0,0,0,.35); display: grid; place-items: center; transform: rotate(-6deg); }
+.lg5 .disc svg { width: 52px; height: 52px; }
+.lg5 .stack { display: flex; flex-direction: column; }
+.lg5 .stack .wm { font-size: 40px; line-height: .86; transform: skew(-6deg); }
+.lg5 .stack .wm + .wm { margin-left: 26px; }
+
+/* ---------- Kopfbereich (3) ---------- */
+/* A: Band, durchgehend über die ganze Fensterbreite */
+html[data-header="band"] .top { margin-left: calc(50% - 50vw); margin-right: calc(50% - 50vw); padding: 12px max(16px, calc((100vw - var(--maxw)) / 2 + 28px)); }
+:root[data-theme][data-header="band"] { --wm1: #fff; --wm2: var(--c3); }
+/* B: Sticker-Streifen (aufgeklebtes Etikett) */
+html[data-header="sticker"] .top { margin: 18px 0 6px; padding: 10px 18px; background: var(--paper); border: 5px solid #fff; border-radius: 18px; box-shadow: 0 0 0 2px #111, 4px 6px 0 2px rgba(0,0,0,.3); transform: rotate(-.5deg); }
+:root[data-theme][data-header="sticker"] { --wm1: var(--ink); --wm2: var(--c1); --wm-stroke: var(--paper); }
+html[data-header="sticker"] .tools button { transform: none; }
+/* C: Album-Seite – die ganze Seite ist ein Blatt mit Rahmen, Trennlinie und Ecken */
+html[data-header="album"] body { padding-top: 18px; }
+html[data-header="album"] .app { background: var(--paper); border: 5px solid var(--outline); border-radius: 24px; box-shadow: 8px 8px 0 var(--shadow); margin: 0 auto 40px; padding: 0 28px 40px; position: relative; max-width: calc(var(--maxw) - 40px); }
+html[data-header="album"] .app::before, html[data-header="album"] .app::after { content: ""; position: absolute; width: 46px; height: 46px; border: 4px solid var(--outline); background: var(--c3); }
+html[data-header="album"] .app::before { left: 14px; top: 14px; border-radius: 6px 0 12px 0; clip-path: polygon(0 0, 100% 0, 0 100%); border-width: 0; opacity: .0; }
+html[data-header="album"] .app::after { display: none; }
+html[data-header="album"] .top { background: transparent; border-bottom: 4px dashed var(--outline); margin: 0 -28px 18px; padding: 18px 28px 16px; color: var(--ink); }
+:root[data-theme][data-header="album"] { --wm1: var(--ink); --wm2: var(--c1); --wm-stroke: var(--paper); }
+html[data-header="album"] .card { background: var(--soft); }
+html[data-header="album"] .tabs { margin-top: 0; }
+/* Album: Eckhalter-Dreiecke wie bei Fotoalben */
+html[data-header="album"] .app { background-image: linear-gradient(135deg, var(--c1) 0 28px, transparent 28px), linear-gradient(225deg, var(--c1) 0 28px, transparent 28px), linear-gradient(45deg, var(--c1) 0 28px, transparent 28px), linear-gradient(315deg, var(--c1) 0 28px, transparent 28px); background-repeat: no-repeat; background-position: 0 0, 100% 0, 0 100%, 100% 100%; background-color: var(--paper); }
+
+/* ---------- Kachel-Glanz (4): nie über dem Text ---------- */
+.t { isolation: isolate; }
+html[data-gloss="none"] .t::after { display: none; }
+html[data-gloss="behind"] .t::after { z-index: -1; background: linear-gradient(115deg, transparent 30%, rgba(255,255,255,.45) 42%, rgba(255,255,255,.12) 52%, transparent 62%); }
+html[data-gloss="edge"] .t::after { display: none; }
+html[data-gloss="edge"] .t { box-shadow: inset 0 4px 0 rgba(255,255,255,.55), inset 4px 0 0 rgba(255,255,255,.28), inset 0 -5px 0 rgba(0,0,0,.22), 3px 3px 0 var(--shadow); }
+html[data-gloss="corner"] .t::after { inset: auto; left: 0; top: 0; width: 22px; height: 22px; z-index: -1; background: radial-gradient(circle at 0 0, rgba(255,255,255,.9) 0 45%, rgba(255,255,255,0) 70%); }
+
+/* ---------- "Voll-Sticker": weißer Stanzrand, Konturschnitt, weicher Schatten, eingerollte Ecken ---------- */
+html[data-trim="sticker"] { --cut: #111; }
+html[data-trim="sticker"][data-theme="dark"] { --cut: #000; }
+html[data-trim="sticker"] .card, html[data-trim="sticker"] .tabs button, html[data-trim="sticker"] .t, html[data-trim="sticker"] .slot.filled, html[data-trim="sticker"] .offer,
+html[data-trim="sticker"] .pl, html[data-trim="sticker"] .hint, html[data-trim="sticker"] .search, html[data-trim="sticker"] .subtabs button, html[data-trim="sticker"] .tools button {
+  border: 5px solid #fff; box-shadow: 0 0 0 2px var(--cut), 0 8px 14px rgba(0,0,0,.35); }
+html[data-trim="sticker"] .card { border-radius: 24px; position: relative; clip-path: none; }
+html[data-trim="sticker"] .t, html[data-trim="sticker"] .slot.filled, html[data-trim="sticker"] .offer, html[data-trim="sticker"] .pl { border-radius: 16px; }
+html[data-trim="sticker"] .t { border-width: 4px; }
+html[data-trim="sticker"] .hint { border-style: solid; background: var(--soft); }
+html[data-trim="sticker"] .hint.open { background: var(--c3); }
+html[data-trim="sticker"] .search { border-radius: 999px; }
+html[data-trim="sticker"] .tabs button { border-radius: 16px; }
+html[data-trim="sticker"] .tabs button.on { background: var(--c2); }
+html[data-trim="sticker"] .slot.empty { border: 4px dashed #fff; box-shadow: none; }
+html[data-trim="sticker"] .pitch { border: 5px solid #fff; box-shadow: 0 0 0 2px var(--cut), 0 8px 14px rgba(0,0,0,.35); border-radius: 22px; }
+html[data-trim="sticker"] .flag { border: 2px solid #fff; box-shadow: 0 0 0 1px var(--cut); }
+html[data-trim="sticker"] .card::after { content: ""; position: absolute; right: -5px; bottom: -5px; width: 40px; height: 40px; border-bottom-right-radius: 22px;
+  background: linear-gradient(135deg, #e6dfc9 0 48%, rgba(0,0,0,.28) 50%, transparent 56%); pointer-events: none; }
+html[data-trim="sticker"] .card { clip-path: polygon(0 0, 100% 0, 100% calc(100% - 40px), calc(100% - 40px) 100%, 0 100%); box-shadow: none; filter: drop-shadow(0 0 0 var(--cut)) drop-shadow(0 8px 10px rgba(0,0,0,.35)); }
+html[data-trim="sticker"] .card > * { position: relative; }
+html[data-trim="sticker"] .wm { -webkit-text-stroke: 5px #fff; paint-order: stroke fill; text-shadow: 0 0 0 transparent; filter: drop-shadow(0 0 0 #111) drop-shadow(2px 4px 0 rgba(0,0,0,.35)); }
+html[data-trim="sticker"] .play-top b, html[data-trim="sticker"] .d-score b { -webkit-text-stroke: 4px #fff; paint-order: stroke fill; text-shadow: none; filter: drop-shadow(0 0 1px #111) drop-shadow(2px 3px 0 rgba(0,0,0,.35)); }
+
+/* ---------- Bedienleiste (nur Entwurf) ---------- */
+.lab { position: fixed; z-index: 100; left: 50%; bottom: 12px; translate: -50% 0; max-width: calc(100vw - 24px); background: #111e; color: #fff; border-radius: 16px; padding: 10px 14px; display: flex; flex-wrap: wrap; gap: 6px 22px; backdrop-filter: blur(8px); font: 600 12px/1.2 system-ui, sans-serif; box-shadow: 0 8px 30px rgba(0,0,0,.5); }
+.lab .grp { display: flex; align-items: center; gap: 4px; flex-wrap: wrap; }
+.lab .grp > b { font-size: 11px; text-transform: uppercase; letter-spacing: .08em; opacity: .6; margin-right: 4px; }
+.lab button { background: #ffffff1f; color: #fff; border: 0; border-radius: 99px; padding: 5px 11px; cursor: pointer; font: inherit; }
+.lab button.on { background: #ffd21f; color: #111; }
+@media (max-width: 760px) { .lab { font-size: 11px; padding: 8px 10px; } }
+
+/* Korrekturen Voll-Sticker: Buchstaben mit weißem Stanzrand brauchen farbige (nicht cremefarbene/weiße) Füllung */
+:root[data-theme][data-header="sticker"], :root[data-theme][data-header="album"] { --wm1: var(--c2); --wm2: var(--c1); --wm-stroke: var(--paper); }
+:root[data-theme][data-trim="sticker"][data-header="band"] { --wm1: var(--c3); --wm2: var(--c2); }
+html[data-trim="sticker"] .play-top b { color: var(--c2); }
+html[data-trim="sticker"] .wm, html[data-trim="sticker"] .play-top b, html[data-trim="sticker"] .d-score b { -webkit-text-stroke-color: #fff; }

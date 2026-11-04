@@ -12,6 +12,9 @@ $map = @{
   NZL='nz'; PAN='pa'; PAR='py'; PER='pe'; PHI='ph'; POL='pl'; POR='pt'; QAT='qa'; ROU='ro'; RSA='za'; RUS='ru'; RWA='rw'
   SCO='gb-sct'; SEN='sn'; SRB='rs'; SUI='ch'; SUR='sr'; SVK='sk'; SVN='si'; SWE='se'; SYR='sy'; TOG='tg'; TUN='tn'; TUR='tr'
   UAE='ae'; UKR='ua'; URU='uy'; USA='us'; UZB='uz'; VEN='ve'; WAL='gb-wls'; ZAM='zm'; ZIM='zw'
+  GBR='gb'; THA='th'; PRK='kp'; VIE='vn'; IND='in'; BAN='bd'; MAS='my'; SIN='sg'; BRU='bn'; BHU='bt'; KUW='kw'; OMA='om'; TJK='tj'; CAM='kh'
+  TRI='tt'; GUA='gt'; ESA='sv'; BAR='bb'; ARU='aw'; AND='ad'; FRO='fo'; LIE='li'; SMR='sm'; MLT='mt'; SLE='sl'; SUD='sd'; BDI='bi'; LBR='lr'
+  CAF='cf'; SEY='sc'; TAN='tz'; NAM='na'; FIJ='fj'; SAM='ws'
 }
 $dir = "$PSScriptRoot\..\web\flags"
 New-Item -ItemType Directory -Force $dir | Out-Null
@@ -23,3 +26,4 @@ foreach ($k in $map.Keys) {
   catch { Write-Host "Fehlt: $k ($($map[$k]))" }
 }
 Write-Host "$ok Flaggen in web/flags/"
+# Historische Flaggen (YUG, URS, GDR) stammen von Wikimedia Commons (gemeinfrei): commons.wikimedia.org/wiki/Special:FilePath/Flag_of_Yugoslavia_(1946-1992).svg, Flag_of_the_Soviet_Union.svg, Flag_of_East_Germany.svg

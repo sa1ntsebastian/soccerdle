@@ -18,6 +18,15 @@ $CLUB_DE = @{
 }
 
 $players = [IO.File]::ReadAllText((Resolve-Path $InFile), [Text.Encoding]::UTF8) | ConvertFrom-Json
+# Zusaetzliche bekannte Spieler ausserhalb der CL (build-extras.ps1), falls vorhanden
+$extrasFile = Join-Path (Split-Path (Resolve-Path $InFile)) 'extras.json'
+if (Test-Path $extrasFile) {
+  $have = @{}; foreach ($p in $players) { $have[$p.id] = $true }
+  $arr = [IO.File]::ReadAllText($extrasFile, [Text.Encoding]::UTF8) | ConvertFrom-Json
+  $extra = @(foreach ($x in $arr) { if (-not $have[$x.id]) { $x } })   # foreach: PS 5.1 entpackt das Array aus ConvertFrom-Json nicht per Pipeline
+  $players = @($players) + $extra
+  Write-Host "Extras angehaengt: $($extra.Count)"
+}
 $slim = foreach ($p in $players) {
   [ordered]@{
     id = $p.id; name = $p.name

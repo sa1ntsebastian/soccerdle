@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Soccerdle – Retro C: Turnier-Poster 1990</title>
+<link rel="stylesheet" href="stile-base.css">
+<style>
+  /* Retro C – Turnier-Poster '90: Sonnenuntergangs-Verlauf, Tricolore-Band, geometrische Formen, kursive Schrift, helle Farben mit dicken Schatten */
+  :root { --indigo: #1d1259; --pink: #ff4f81; --orange: #ff9f45; --sun: #ffd23f; --teal: #12b5a6; --card: #fffdf7; --ink: #1d1259; --muted: #6b6591; --green: #0fa968; --red: #ff3b5c; --white: #fff; }
+  body { color: var(--ink); font: 600 15px/1.45 "Trebuchet MS", "Segoe UI", Verdana, sans-serif; min-height: 100vh;
+    background: radial-gradient(circle at 85% 12%, var(--sun) 0 70px, transparent 71px), linear-gradient(180deg, #2a1a7a 0%, #7b2d9c 38%, var(--pink) 68%, var(--orange) 100%); background-attachment: fixed; }
+  body::before { content: ""; position: fixed; inset: 0; pointer-events: none; z-index: 0; background: linear-gradient(115deg, transparent 0 70%, rgba(18,181,166,.55) 70% 73%, transparent 73% 80%, rgba(255,210,63,.35) 80% 82%, transparent 82%); }
+  .app { position: relative; z-index: 1; }
+  .muted { color: var(--muted); }
+  .top { padding: 20px 0 14px; color: #fff; }
+  .logo-mark svg { width: 62px; height: 62px; filter: drop-shadow(3px 4px 0 rgba(0,0,0,.35)); }
+  .wm { font-weight: 900; font-style: italic; font-size: 38px; letter-spacing: -.02em; text-shadow: 3px 3px 0 var(--indigo), 6px 6px 0 rgba(0,0,0,.25); }
+  .w2 { color: var(--sun); }
+  .logo-txt small { color: #fff; font-style: italic; opacity: .9; letter-spacing: .06em; }
+  .tools button { background: #fff; color: var(--indigo); border: 0; border-radius: 14px; box-shadow: 3px 3px 0 var(--indigo); }
+  /* Tricolore-Band */
+  .tabs { background: var(--card); border-radius: 16px; padding: 6px; box-shadow: 5px 5px 0 var(--indigo); position: relative; margin-top: 12px; gap: 4px; }
+  .tabs::before { content: ""; position: absolute; left: 14px; right: 14px; top: -9px; height: 9px; border-radius: 6px 6px 0 0; background: linear-gradient(90deg, var(--green) 0 33.3%, #fff 33.3% 66.6%, var(--red) 66.6%); }
+  .tabs button { border-radius: 12px; color: var(--muted); font-style: italic; font-weight: 800; }
+  .tabs button.on { background: linear-gradient(135deg, var(--pink), var(--orange)); color: #fff; box-shadow: 2px 2px 0 var(--indigo); }
+  .card { background: var(--card); border-radius: 22px; box-shadow: 7px 7px 0 var(--indigo); position: relative; overflow: hidden; }
+  .card::after { content: ""; position: absolute; right: -26px; top: -26px; width: 86px; height: 86px; border-radius: 50%; background: var(--sun); opacity: .9; z-index: 0; }
+  .card > * { position: relative; z-index: 1; }
+  .subtabs button { background: #efeaff; border: 0; border-radius: 999px; color: var(--indigo); font-weight: 800; font-style: italic; }
+  .subtabs .on { background: var(--indigo); color: #fff; }
+  .play-top b { font-size: 30px; font-weight: 900; font-style: italic; color: var(--indigo); letter-spacing: -.02em; }
+  .yest { color: var(--muted); } .yest b { color: var(--pink); }
+  .search { border: 3px solid var(--indigo); border-radius: 16px; background: #fff; color: var(--muted); box-shadow: 4px 4px 0 var(--teal); }
+  .hint { background: #f3efff; border-radius: 14px; color: var(--muted); border: 2px dashed #b9aef0; }
+  .hint i { color: var(--pink); font-weight: 900; font-style: italic; } .hint.open { background: var(--teal); border: 0; color: #fff; box-shadow: 3px 3px 0 var(--indigo); } .hint.open i { color: var(--sun); }
+  .g-head em { color: var(--pink); font-style: italic; font-weight: 900; }
+  .g-row { border-top: 2px dashed #d7cffb; }
+  .g-name b { font-weight: 900; font-style: italic; } .g-name small { color: var(--muted); }
+  .t { color: #fff; border-radius: 14px; font-weight: 900; font-style: italic; font-size: 14px; box-shadow: 3px 3px 0 var(--indigo); border: 2px solid var(--indigo); }
+  .t.hit { background: var(--green); } .t.near { background: var(--sun); color: var(--indigo); } .t.miss { background: var(--red); }
+  .flag { border-radius: 4px; border: 2px solid var(--indigo); width: 26px; height: 18px; }
+  .g-row.win .g-name b { color: var(--green); }
+  .legend { color: var(--muted); } .legend i { border: 2px solid var(--indigo); border-radius: 50%; }
+  .legend .hit { background: var(--green); } .legend .near { background: var(--sun); } .legend .miss { background: var(--red); }
+  .d-score span { font-style: italic; font-weight: 900; color: var(--pink); letter-spacing: .08em; text-transform: uppercase; font-size: 13px; }
+  .d-score b { font-size: 70px; font-weight: 900; font-style: italic; letter-spacing: -.05em; color: var(--indigo); text-shadow: 4px 4px 0 var(--sun); }
+  .pitch { border-radius: 18px; border: 4px solid var(--indigo); background: repeating-linear-gradient(0deg, #14c1a0 0 12.5%, #10b394 12.5% 25%); box-shadow: 5px 5px 0 var(--indigo); }
+  .pitch::before { content: ""; position: absolute; inset: 12px; border: 3px solid rgba(255,255,255,.9); border-radius: 10px; }
+  .pitch::after { content: ""; position: absolute; left: 50%; top: 50%; width: 26%; aspect-ratio: 1; translate: -50% -50%; border: 3px solid rgba(255,255,255,.9); border-radius: 50%; }
+  .slot.filled { background: #fff; border: 3px solid var(--indigo); border-radius: 14px; box-shadow: 3px 3px 0 var(--indigo); }
+  .slot .r { font-size: 24px; font-weight: 900; font-style: italic; background: linear-gradient(135deg, var(--pink), var(--orange)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .slot .n { font-weight: 800; } .slot small { color: var(--muted); }
+  .slot.empty { border: 3px dashed #fff; color: #fff; border-radius: 14px; background: rgba(29,18,89,.2); font-weight: 900; font-style: italic; }
+  .slot.pend { outline: 4px solid var(--sun); }
+  .acts .ok { background: var(--green); color: #fff; border: 2px solid var(--indigo); } .acts .undo { background: #fff; border: 2px solid var(--indigo); }
+  .intro { color: var(--muted); } .intro b { color: var(--ink); }
+  .offer { background: #fff; border: 3px solid var(--indigo); border-radius: 18px; box-shadow: 4px 4px 0 var(--indigo); }
+  .offer span { font-weight: 800; font-size: 13px; } .offer b { font-weight: 900; font-style: italic; color: var(--pink); }
+  .offer small { color: var(--muted); } .offer.on { background: var(--sun); box-shadow: 4px 4px 0 var(--pink); } .offer.on b { color: var(--indigo); }
+  .pl { background: #f6f3ff; border-radius: 12px; border: 2px solid #ddd5ff; } .pl em { color: var(--pink); font-style: italic; font-weight: 900; } .pl b { color: var(--indigo); font-weight: 900; font-style: italic; }
+  footer { color: rgba(255,255,255,.85); font-style: italic; }
+</style>
+</head>
+<body>
+<div class="app" id="app"></div>
+<script src="stile.js"></script>
+<script>
+  // Ball mit Tricolore-Streifen und Schweif
+  renderMock(document.getElementById('app'), { logo: `<span class="logo-mark"><svg viewBox="0 0 64 64"><path d="M2 22h18M0 30h22M4 38h16" stroke="#fff" stroke-width="3" stroke-linecap="round"/><circle cx="38" cy="32" r="22" fill="#fff" stroke="#1d1259" stroke-width="3"/><path d="M38 10a22 22 0 0 1 7 1.2L38 20z" fill="#0fa968"/><path d="m38 21 8.5 6.2-3.2 10H32.7l-3.2-10z" fill="#1d1259"/><path d="M38 21V10M46.5 27.2l9.5-3M43.3 37.2l5.5 7.5M32.7 37.2l-5.5 7.5M29.5 27.2 20 24" stroke="#1d1259" stroke-width="2.6" fill="none"/><path d="M52 50a22 22 0 0 1-14 4v-8z" fill="#ff3b5c"/></svg></span>` });
+</script>
+</body>
+</html>

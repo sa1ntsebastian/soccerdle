@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Soccerdle – Sticker-Album (Endfassung 2: Panini-Sticker)</title>
+<link rel="stylesheet" href="stile-base.css">
+<link rel="stylesheet" href="panini.css">
+<style>
+  /* Endfassung 2: alles als Panini-Sticker. Farben wie Endfassung 1 (Tag + Nacht). */
+  :root { --bg: #ffd21f; --pattern: repeating-linear-gradient(135deg, rgba(255,255,255,.22) 0 14px, transparent 14px 28px);
+    --paper: #fff; --sticker: #fff; --field-bg: #fff; --soft: #f6f6f3; --ink: #111; --outline: #111; --shadow: #111; --muted: #595959; --dot: rgba(10,79,196,.10);
+    --c1: #e4002b; --c1-dark: #e4002b; --c2: #1f4fd8; --c3: #ffd21f; --on-c3: #111; --ok: #00a651; --warn: #ffd21f; --bad: #e4002b;
+    --wm1: #1f4fd8; --wm2: #e4002b; --wm-shadow: #111; --title-color: #111; --title-shadow: #ffd21f; --f1: #1fae5b; --f2: #17a04f; --maxw: 1320px; color-scheme: light; }
+  :root[data-theme="dark"] { --bg: #0f1226; --pattern: repeating-linear-gradient(135deg, rgba(255,210,31,.06) 0 14px, transparent 14px 28px);
+    --paper: #1b2040; --sticker: #232a52; --field-bg: #10142c; --soft: #222952; --ink: #f7efd2; --outline: #f7efd2; --shadow: #000; --muted: #b9bfdf; --dot: rgba(247,239,210,.06);
+    --c1: #ff4a6a; --c1-dark: #b0132f; --c2: #6c9bff; --c3: #ffd21f; --on-c3: #111; --ok: #1fbf6a; --warn: #ffd21f; --bad: #ef3b52;
+    --wm1: #ff4a6a; --wm2: #ffd21f; --wm-shadow: #04050d; --title-color: #ff4a6a; --title-shadow: #04050d; --f1: #167a42; --f2: #126f3b; color-scheme: dark; }
+  @media (min-width: 1500px) { :root { --maxw: 1440px; } }
+</style>
+</head>
+<body>
+<div class="app" id="app"></div>
+<script src="stile.js"></script>
+<script>
+  const ball = `<svg class="o-ball" viewBox="0 0 80 80" aria-hidden="true"><circle cx="40" cy="40" r="34" fill="#fff" stroke="#111" stroke-width="3"/>
+    <path d="m40 18 15 11-5.7 17.6H30.7L25 29z" fill="#1f4fd8" stroke="#111" stroke-width="3"/>
+    <path d="M40 18V6M55 29l13-4M49.3 46.6l8 11M30.7 46.6l-8 11M25 29l-13-4" stroke="#111" stroke-width="3" fill="none"/></svg>`;
+  renderMock(document.getElementById('app'), { fullLogo: true, logo: `<span class="wm" role="img" aria-label="Soccerdle"><span class="w1">S</span>${ball}<span class="w1">CCER</span><span class="w2">DLE</span></span>` });
+</script>
+</body>
+</html>

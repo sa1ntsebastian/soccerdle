@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Soccerdle – Logo-Schriften (Google Fonts, OFL)</title>
+<style>
+  body { margin: 0; padding: 24px; font: 15px/1.4 system-ui, sans-serif; background: #ddd; color: #111; }
+  h1 { margin: 0 0 4px; } p { margin: 0 0 18px; color: #444; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(520px, 1fr)); gap: 16px; }
+  .cell { border-radius: 14px; overflow: hidden; border: 1px solid #0002; }
+  .row { padding: 18px 22px; display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+  .day { background: #fff; --a: #1f4fd8; --b: #e4002b; --line: #111; }
+  .night { background: #1b2040; --a: #ff4a6a; --b: #ffd21f; --line: #05060f; color: #f7efd2; }
+  .name { font: 600 12px system-ui; opacity: .65; white-space: nowrap; }
+  /* Logo: Schrift mit dunkler Kontur + kurzem Schatten wie bei der Rating-Zahl; Ball sitzt auf der Grundlinie und ist so hoch wie die Versalien */
+  .wm { display: inline-block; white-space: nowrap; font-size: 54px; line-height: 1.1; letter-spacing: .02em; color: var(--a); transform: rotate(-2.5deg);
+    -webkit-text-stroke: .07em var(--line); paint-order: stroke fill; text-shadow: .06em .06em 0 var(--line); }
+  .wm .b { color: var(--b); }
+  .wm svg { display: inline-block; width: calc(var(--cap, .72) * 1em); height: calc(var(--cap, .72) * 1em); vertical-align: baseline; margin: 0 .02em; filter: drop-shadow(.06em .06em 0 var(--line)); }
+</style>
+</head>
+<body>
+<h1>Logo-Schriften – Google Fonts (OFL, würden selbst gehostet)</h1>
+<p>Gleicher Stil wie die Rating-Zahl (Kontur + kurzer Schatten), oben Tag, unten Nacht. Der Ball sitzt auf der Grundlinie, so hoch wie die Versalien der jeweiligen Schrift.</p>
+<div class="grid" id="grid"></div>
+<script>
+  const fonts = [['Lilita One', 'lilita-one'], ['Titan One', 'titan-one'], ['Bowlby One', 'bowlby-one'], ['Luckiest Guy', 'luckiest-guy'], ['Anton', 'anton'], ['Paytone One', 'paytone-one'], ['Chango', 'chango'], ['Bungee', 'bungee'], ['Alfa Slab One', 'alfa-slab-one'], ['Passion One', 'passion-one'], ['Sigmar One', 'sigmar-one'], ['Baloo 2 (800)', 'baloo-2']];
+  const css = fonts.map(([n, f]) => `@font-face { font-family: "${n}"; src: url(fonts/${f}.woff2) format("woff2"); font-display: block; }`).join('\n');
+  document.head.insertAdjacentHTML('beforeend', `<style>${css}</style>`);
+  const ball = `<svg viewBox="0 0 80 80" aria-hidden="true"><circle cx="40" cy="40" r="37" fill="#fff" stroke="#111" stroke-width="4"/><path d="m40 17 16 11.7-6.1 18.8H30.1L24 28.7z" fill="#1f4fd8" stroke="#111" stroke-width="3.5"/><path d="M40 17V4M56 28.7l14-4.6M49.9 47.5l8.6 11.8M30.1 47.5l-8.6 11.8M24 28.7l-14-4.6" stroke="#111" stroke-width="3.5" fill="none"/></svg>`;
+  const grid = document.getElementById('grid');
+  document.fonts.ready.then(() => Promise.all(fonts.map(([n]) => document.fonts.load(`40px "${n}"`)))).then(() => {
+    const cv = document.createElement('canvas').getContext('2d');
+    for (const [n] of fonts) {
+      cv.font = `100px "${n}"`; const cap = cv.measureText('H').actualBoundingBoxAscent / 100;
+      const wm = `<span class="wm" style="font-family:'${n}'; --cap:${cap.toFixed(3)}">S${ball}CCER<span class="b">DLE</span></span>`;
+      grid.insertAdjacentHTML('beforeend', `<div class="cell"><div class="row day">${wm}<span class="name">${n}</span></div><div class="row night">${wm}<span class="name">${n}</span></div></div>`);
+    }
+  });
+</script>
+</body>
+</html>
