@@ -81,14 +81,20 @@ Reihenfolge:
 
 ## Nächste Schritte
 ### Draft (vom Besitzer gewünscht)
-1. **Ratings im Kader verstecken** – Spieler-Ratings UND Ø-Ratings der Teams. Rating erst sichtbar, wenn der Spieler auf dem Feld steht (oder erst am Ende).
-2. **Punkte strecken**: Wer sich „nicht dumm anstellt“, soll bei **80–90** landen; **über 95 muss wirklich schwer** sein.
+1. **Ratings komplett weg während des Drafts** – keine Spieler-Ratings im Kader, keine Ø-Ratings bei den Team-Angeboten, auch kein Live-Team-Rating. Ratings/Punkte erst am Ende (Auflösung + perfekte Elf).
+2. **Nationalteams als Draft-Teams ergänzen** – z. B. „Deutschland · WM 2014“, „Spanien · EM 2012“ neben den Vereins-Saisons. Datenbasis: Turnierkader (Wikipedia „… squads“-Artikel) bzw. die Final-Aufstellungen in `data/lineups.json`. *(Vom Besitzer kurz bestätigen lassen, falls unklar – gemeint könnte auch nur „Nation/Flagge im Kader anzeigen“ sein; das ist bereits umgesetzt.)*
+3. **Draft-Erklärung** im Spiel: kurze Anleitung beim ersten Start bzw. über „?“ (Ablauf in 3–4 Schritten, Positionsabzug, wie die 100 Punkte entstehen).
+4. **Punkte strecken**: Wer sich „nicht dumm anstellt“, soll bei **80–90** landen; **über 95 muss wirklich schwer** sein.
    Idee: 0 = Durchschnittswahl (z. B. mittlerer Spieler der angebotenen Kader auf passender Position), 100 = Optimum, dazwischen nicht-linear (z. B. Potenzkurve) und mit Simulationen kalibrieren (gierige Strategie *ohne* Rating-Kenntnis ≈ 80–85).
-3. Optimum darf denselben Spieler nicht doppelt nehmen (gleicher Spieler in zwei Team-Saisons) – derzeit möglich.
-4. Optional: Chemie-Bonus, Formationswahl.
+5. Optimum darf denselben Spieler nicht doppelt nehmen (gleicher Spieler in zwei Team-Saisons) – derzeit möglich.
+6. Optional: Chemie-Bonus, Formationswahl.
+
+### Anleitungen (vom Besitzer gewünscht)
+- **Generell übersichtlicher und einfacher**: pro Modus eine kurze Anleitung (max. 3–4 Punkte, Beispiele statt Fließtext, Farb-Legende als Grafik).
+- Der „?“-Knopf zeigt die Anleitung **des gerade offenen Modus** (derzeit nur Klassik, und die ist zu lang).
+- Beim ersten Öffnen eines Modus einmalig die Kurz-Anleitung zeigen.
 
 ### Allgemein / Launch
-- Hilfe-Dialog („?“) erklärt bisher nur Klassik → Texte für alle Modi.
 - Tagesrätsel: feste, vorab erzeugte Liste (keine Wiederholungen) statt Hash-Zufall.
 - Impressum + Datenschutzerklärung (Pflicht AT/DE), `CONFIG.testMode = false`, `<meta name="robots" content="noindex">` in index.html entfernen.
 - Testversion läuft über GitHub Pages (`.github/workflows/pages.yml` veröffentlicht `web/` bei jedem Push auf main; Repo dafür öffentlich).
