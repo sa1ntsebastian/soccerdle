@@ -1,0 +1,13 @@
+{
+    "formula":  "b0 + b1*ln(sitelinks) + b2*clubStrength + b3*max(0,26-age)^2 + b4*max(0,age-30)^2 + b5*isGK",
+    "weights":  {
+                    "konstante":  34.7079,
+                    "ln_bekanntheit":  8.9743,
+                    "vereinsstaerke":  2.0447,
+                    "jung2":  -0.1848,
+                    "alt2":  -0.0646,
+                    "torwart":  0.0529
+                },
+    "trainedOn":  "24378 Spieler-Saisons",
+    "r2":  0.444
+}

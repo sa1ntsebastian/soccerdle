@@ -1,0 +1,16 @@
+# Rohdaten-Cache der Pipelines (~800 MB, wird bei Bedarf neu geladen).
+# Enthält u. a. FIFA-Daten -> darf NIE veröffentlicht werden.
+.cache/
+
+# Persönliche Kontaktadresse für Wikimedia (User-Agent)
+pipeline/contact.local.txt
+
+# Temporäre Testseiten
+web/_test*.html
+web/_frame*.html
+
+# Editor / System
+.vs/
+.vscode/
+Thumbs.db
+desktop.ini

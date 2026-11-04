@@ -1,0 +1,74 @@
+=== Soccerdle Import 2026-11-04 14:55 ===
+Spieler: 983
+
+Kader pro Verein:
+Paris Saint-Germain           24
+Bayern Munich                 24
+Real Madrid                   26
+Liverpool                     35
+Inter Milan                   24
+Manchester City               34
+Arsenal                       25
+Barcelona                     27
+Atlético Madrid               24
+Borussia Dortmund             30
+Roma                          25
+Sporting CP                   30
+Aston Villa                   28
+Porto                         30
+Manchester United             30
+Club Brugge                   26
+Real Betis                    25
+PSV Eindhoven                 30
+Feyenoord                     29
+Lille                         25
+Bodø/Glimt                    22
+Napoli                        27
+RB Leipzig                    29
+Villarreal                    24
+Fenerbahçe                    28
+Shakhtar Donetsk              32
+Galatasaray                   30
+Slavia Prague                 22
+Slovan Bratislava             30
+VfB Stuttgart                 30
+AEK Athens                    27
+LASK                          24
+Como                          27
+Lens                          28
+Viking                        27
+Sabah                         26
+
+Fehlende Werte:
+nationality   983/983 gefuellt   
+positions     983/983 gefuellt   
+birthDate     974/983 gefuellt   Ryan Roberto (Shakhtar Donetsk), João Afonso (Porto), Benno Kaltefleiter (RB Leipzig), Ertuğrul Yiğit (VfB Stuttgart), Matúš Tomáško (Slovan Bratislava), Leo Hofstädter (Slovan Bratislava), Claudio Pugliese (Napoli), Alexej Maroš (Slovan Bratislava), Rodrigo Dias (Sporting CP)
+heightCm      950/983 gefuellt   Jack Fletcher (Manchester United), Jesse Bisiwu (Barcelona), Jesse Derry (Sporting CP), Brian Fariñas (Barcelona), Mezian Mesloub (Lens), Joy-Lance Mickels (Sabah), Aden McCarthy (Sabah), Justin Lerma (Borussia Dortmund), Giorgio De Marzi (Roma), Christian Nwachukwu (Sabah), Gianluca Okon (Club Brugge), Tian Nai Koren (Club Brugge), Orphé Mbina (Sabah), Ryan Roberto (Shakhtar Donetsk), Amir Bouhamdi (PSV Eindhoven)
+foot          937/983 gefuellt   Jesse Bisiwu (Barcelona), Jesse Derry (Sporting CP), Brian Fariñas (Barcelona), Joy-Lance Mickels (Sabah), Modou Kéba Cissé (Aston Villa), Alessandro Longoni (Paris Saint-Germain), Kaden Braithwaite (Manchester City), Aden McCarthy (Sabah), Justin Lerma (Borussia Dortmund), Amara Diouf (Fenerbahçe), Yacine Titraoui (Lens), Christian Nwachukwu (Sabah), Gianluca Okon (Club Brugge), Suleiman Camara (Slovan Bratislava), Steve Solvet (Sabah)
+number        977/983 gefuellt   Omar Marmoush (Manchester City), Pierce Charles (Manchester City), Frantzdy Pierrot (AEK Athens), Gabriel Veron (Porto), Maryan Shved (Shakhtar Donetsk), Viktor Korniyenko (Shakhtar Donetsk)
+tmId          974/983 gefuellt   Ryan Roberto (Shakhtar Donetsk), João Afonso (Porto), Benno Kaltefleiter (RB Leipzig), Ertuğrul Yiğit (VfB Stuttgart), Matúš Tomáško (Slovan Bratislava), Leo Hofstädter (Slovan Bratislava), Claudio Pugliese (Napoli), Alexej Maroš (Slovan Bratislava), Rodrigo Dias (Sporting CP)
+
+Zweitposition erkannt: 46
+Nationalitaeten-Codes: ALB ALG ANG ARG ARM AUS AUT AZE BEL BFA BIH BRA BUL CAN CIV CMR COD COL CPV CRO CUW CZE DEN DOM ECU EGY ENG ESP FIN FRA GAB GAM GEO GER GHA GLP GNB GRE GUI HAI HON HUN IDN IRL ISL ITA JAM JPN KAZ KOR KSA KVX LBY LUX MAR MEX MKD MLI MNE MOZ MTN NED NGA NIR NOR NZL PAN PAR POL POR ROU RSA RUS RWA SCO SEN SRB SUI SUR SVK SVN SWE TUN TUR UKR URU USA UZB VEN WAL
+
+Top 20 nach Bekanntheit:
+  Erling Haaland             Manchester City          15 123 633
+  Lamine Yamal               Barcelona                12 556 690
+  Kylian Mbappé              Real Madrid              10 999 026
+  Harry Kane                 Bayern Munich             8 354 667
+  Jude Bellingham            Real Madrid               7 336 686
+  Michael Olise              Bayern Munich             5 768 236
+  Deniz Undav                VfB Stuttgart             3 438 154
+  Ousmane Dembélé            Paris Saint-Germain       3 394 018
+  Zion Suzuki                Aston Villa               3 057 106
+  Marc Cucurella             Real Madrid               2 726 112
+  Ferran Torres              Paris Saint-Germain       2 665 724
+  Romelu Lukaku              Fenerbahçe                2 644 878
+  Anthony Gordon             Barcelona                 2 620 458
+  Vinícius Júnior            Real Madrid               2 615 534
+  Bukayo Saka                Arsenal                   2 321 062
+  Marcus Rashford            Manchester United         2 319 874
+  Antoine Semenyo            Manchester City           2 294 000
+  Manuel Neuer               Bayern Munich             2 276 363
+  Declan Rice                Arsenal                   2 267 818
+  Enzo Fernández             Manchester City           2 242 219

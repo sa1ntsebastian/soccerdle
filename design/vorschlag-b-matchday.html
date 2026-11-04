@@ -1,0 +1,167 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Soccerdle – Entwurf B: Matchday</title>
+<style>
+  :root {
+    --grass-1: #2f9a52; --grass-2: #36a85b;
+    --bg: #f2f5ef; --card: #ffffff; --text: #18241c; --muted: #66756b; --line: #e1e7de;
+    --hit: #2fbf6a; --near: #ffb330; --miss: #ff6655;
+    --hit-ink: #fff; --near-ink: #3d2700; --miss-ink: #fff;
+    --radius: 16px;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--text);
+    font: 15px/1.4 ui-rounded, "SF Pro Rounded", "Segoe UI", system-ui, sans-serif; }
+
+  /* Kopfbereich: gemähter Rasen */
+  .hero {
+    background: repeating-linear-gradient(90deg, var(--grass-1) 0 44px, var(--grass-2) 44px 88px);
+    color: #fff; padding: 18px 16px 64px; text-align: center; position: relative; overflow: hidden;
+  }
+  .hero::after { /* Mittellinie + Kreis */
+    content: ""; position: absolute; left: 50%; bottom: -70px; width: 160px; height: 160px; translate: -50% 0;
+    border: 3px solid rgba(255,255,255,.35); border-radius: 50%;
+  }
+  .hero h1 { margin: 0; font-size: 34px; font-weight: 900; letter-spacing: -.5px; text-shadow: 0 2px 0 rgba(0,0,0,.15); }
+  .hero h1 em { font-style: normal; display: inline-block; background: #fff; color: var(--grass-1);
+    border-radius: 8px; padding: 0 7px; margin-left: 3px; transform: rotate(-3deg); }
+  .hero p { margin: 4px 0 0; opacity: .9; font-size: 13px; font-weight: 600; }
+
+  .wrap { max-width: 780px; margin: -44px auto 0; padding: 0 16px 40px; position: relative; }
+
+  .card { background: var(--card); border-radius: var(--radius); box-shadow: 0 1px 2px rgba(0,0,0,.06), 0 8px 24px rgba(30,60,40,.08); }
+
+  /* Modi als Segment */
+  .modes { display: flex; gap: 6px; padding: 6px; margin-bottom: 12px; overflow-x: auto; }
+  .mode { flex: 1; white-space: nowrap; border: 0; background: transparent; padding: 9px 12px; border-radius: 11px;
+    font: inherit; font-weight: 700; color: var(--muted); }
+  .mode.active { background: var(--text); color: #fff; }
+
+  .play { padding: 16px; margin-bottom: 14px; }
+  .play-top { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 10px; }
+  .play-top b { font-size: 17px; }
+  .play-top span { color: var(--muted); font-size: 13px; font-weight: 600; }
+  .search input { width: 100%; padding: 14px 16px; font: inherit; font-size: 16px; border-radius: 12px;
+    border: 2px solid var(--line); background: #fafcf9; outline: none; }
+  .search input:focus { border-color: var(--grass-1); background: #fff; }
+
+  /* Hinweise als Sticker */
+  .hints { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 12px; }
+  .hint { border-radius: 12px; padding: 8px; text-align: center; background: #f4f7f2; border: 2px dashed var(--line); }
+  .hint.open { background: #fff8e6; border: 2px solid #ffd77a; transform: rotate(-1.5deg); }
+  .hint .lbl { font-size: 11px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: .5px; }
+  .hint .val { font-weight: 900; margin-top: 2px; }
+  .hint .lock { font-size: 12px; color: var(--muted); margin-top: 2px; display: flex; gap: 4px; justify-content: center; align-items: center; }
+  .ico-lock { width: 12px; height: 12px; fill: currentColor; }
+
+  /* Ein Tipp = eine Karte */
+  .guess { padding: 12px; margin-bottom: 10px; display: grid; grid-template-columns: 150px 1fr; gap: 12px; align-items: center; }
+  .guess.win { box-shadow: 0 0 0 3px var(--hit), 0 8px 24px rgba(47,191,106,.25); }
+  .who { display: flex; align-items: center; gap: 10px; min-width: 0; }
+  .avatar { flex: none; width: 44px; height: 44px; border-radius: 50%; display: grid; place-items: center;
+    background: #eef3ec; font-weight: 900; color: var(--grass-1); font-size: 15px; }
+  .guess.win .avatar { background: var(--hit); color: #fff; }
+  .who .n { font-weight: 800; line-height: 1.15; font-size: 14px; }
+  .who .c { color: var(--muted); font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .who > div { min-width: 0; }
+
+  .chips { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 6px; }
+  .chip { border-radius: 12px; padding: 6px 4px 7px; text-align: center; position: relative; min-height: 78px;
+    display: flex; flex-direction: column; align-items: center; justify-content: space-between; gap: 2px; }
+  .chip .k { font-size: 9.5px; font-weight: 800; text-transform: uppercase; letter-spacing: .5px; opacity: .8; }
+  .chip .v { font-weight: 800; font-size: 12px; line-height: 1.1; }
+  .chip .num { font-weight: 900; font-size: 22px; line-height: 1; }
+  .chip.hit  { background: var(--hit);  color: var(--hit-ink); }
+  .chip.near { background: var(--near); color: var(--near-ink); }
+  .chip.miss { background: var(--miss); color: var(--miss-ink); }
+  .arrow { position: absolute; top: -6px; right: -4px; width: 22px; height: 22px; border-radius: 50%;
+    background: var(--text); color: #fff; display: grid; place-items: center; font-size: 13px; font-weight: 900;
+    box-shadow: 0 2px 4px rgba(0,0,0,.2); }
+
+  .flag { width: 30px; height: 30px; border-radius: 50%; object-fit: cover; box-shadow: 0 0 0 2px rgba(255,255,255,.85); }
+  .ico-pitch { width: 40px; height: 27px; }
+  .ico-pitch rect { fill: rgba(255,255,255,.22); }
+  .ico-pitch rect.on { fill: #fff; }
+  .chip.near .ico-pitch rect { fill: rgba(61,39,0,.15); } .chip.near .ico-pitch rect.on { fill: var(--near-ink); }
+  .ico-pitch .line { fill: none; stroke: currentColor; stroke-opacity: .6; stroke-width: 1.2; }
+  .ico-feet { width: 30px; height: 27px; }
+  .ico-feet path { fill: currentColor; opacity: .25; }
+  .ico-feet path.on { opacity: 1; }
+  .league-badge { font-size: 11px; font-weight: 900; padding: 4px 6px; border-radius: 6px; background: rgba(255,255,255,.25); }
+  .chip.near .league-badge { background: rgba(0,0,0,.08); }
+
+  .reveal .chip { animation: pop .4s cubic-bezier(.3,1.6,.6,1) both; }
+  .reveal .chip:nth-child(2) { animation-delay: .06s } .reveal .chip:nth-child(3) { animation-delay: .12s }
+  .reveal .chip:nth-child(4) { animation-delay: .18s } .reveal .chip:nth-child(5) { animation-delay: .24s }
+  .reveal .chip:nth-child(6) { animation-delay: .30s } .reveal .chip:nth-child(7) { animation-delay: .36s }
+  @keyframes pop { from { transform: scale(.6); opacity: 0; } to { transform: none; opacity: 1; } }
+
+  .note { padding: 12px 14px; font-size: 13px; color: var(--muted); margin-top: 18px; }
+
+  /* Handy: Name oben, Eigenschaften in 2 Reihen (4 + 3) – kein seitliches Wischen */
+  @media (max-width: 620px) {
+    .guess { grid-template-columns: 1fr; gap: 8px; }
+    .chips { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+    .chip { min-height: 70px; }
+    .hero h1 { font-size: 28px; }
+  }
+</style>
+</head>
+<body>
+  <header class="hero">
+    <h1>Soccer<em>dle</em></h1>
+    <p>Champions League 2026/27 · Rätsel #4</p>
+  </header>
+
+  <div class="wrap">
+    <nav class="card modes">
+      <button class="mode active">📅 Täglich</button>
+      <button class="mode">∞ Endlos</button>
+      <button class="mode">🏆 Ligen</button>
+      <button class="mode">📊</button>
+    </nav>
+
+    <section class="card play">
+      <div class="play-top"><b>Wer ist es?</b><span>5 Versuche</span></div>
+      <div class="search"><input placeholder="Spielername eingeben …" aria-label="Spieler suchen"></div>
+      <div class="hints" id="hints"></div>
+    </section>
+
+    <section id="guesses"></section>
+
+    <p class="card note"><b>Entwurf B – Matchday.</b> Hell und freundlich, jeder Tipp ist eine eigene Karte mit Beschriftung in jeder Kachel.
+      Flaggen rund, Pfeile als Badge. Am Handy brechen die Eigenschaften in zwei Reihen um – kein seitliches Wischen nötig.</p>
+  </div>
+
+<script src="shared.js"></script>
+<script>
+  const { rows, hints } = MOCK;
+  document.getElementById('hints').innerHTML = hints.map(h => `
+    <div class="hint${h.open ? ' open' : ''}"><div class="lbl">${h.label}</div>
+      ${h.open ? `<div class="val">${h.value}</div>` : `<div class="lock">${ICONS.lock} in ${h.left}</div>`}
+    </div>`).join('');
+
+  const initials = n => n.split(' ').map(w => w[0]).slice(0, 2).join('');
+  const arrow = d => d ? `<span class="arrow">${d === 'up' ? '↑' : '↓'}</span>` : '';
+  const num = (k, [v, s, d], unit = '') => `<div class="chip ${s}"><span class="k">${k}</span><span class="num">${v}</span><span class="v">${unit}</span>${arrow(d)}</div>`;
+
+  document.getElementById('guesses').innerHTML = rows.map((r, i) => `
+    <article class="card guess${r.win ? ' win' : ''}${i === 0 ? ' reveal' : ''}">
+      <div class="who"><div class="avatar">${initials(r.name)}</div>
+        <div><div class="n">${r.name}</div><div class="c">${r.club}</div></div></div>
+      <div class="chips">
+        <div class="chip ${r.league[1]}" title="${r.league[0] === 'Andere' ? 'Keine Top-5-Liga' : r.league[0]}"><span class="k">Liga</span><span class="league-badge">${r.league[0]}</span><span class="v">&nbsp;</span></div>
+        <div class="chip ${r.nat[2]}"><span class="k">Nation</span>${ICONS.flag(r.nat[0])}<span class="v">${r.nat[1]}</span></div>
+        <div class="chip ${r.pos[1]}"><span class="k">Position</span>${ICONS.pitch(r.pos[0])}<span class="v">${r.pos[0].join('/')}</span></div>
+        ${num('Alter', r.age, 'Jahre')}
+        ${num('Größe', r.height, 'cm')}
+        <div class="chip ${r.foot[1]}"><span class="k">Fuß</span>${ICONS.feet(r.foot[0])}<span class="v">${FOOT_TEXT[r.foot[0]]}</span></div>
+        ${num('Nr.', r.number)}
+      </div>
+    </article>`).join('');
+</script>
+</body>
+</html>

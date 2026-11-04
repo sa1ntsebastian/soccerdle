@@ -1,0 +1,5 @@
+{
+  "_hinweis": "Manuelle Korrekturen fuer das Soccerdle-Rating (Draft). Schluessel = Wikidata-ID des Spielers, 'punkte' wird zur Formel addiert (+/-). 'name' nur zur Lesbarkeit. Danach pipeline/export-modes.ps1 ausfuehren.",
+  "Q615":   { "name": "Lionel Messi",       "punkte": 4 },
+  "Q11571": { "name": "Cristiano Ronaldo",  "punkte": 4 }
+}

@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Soccerdle</title>
+  <meta name="description" content="Errate den Fußballspieler der Champions League – jeden Tag ein neues Rätsel.">
+  <meta name="theme-color" content="#1d6b3d">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><circle cx='12' cy='12' r='11' fill='%231f7a45'/><path d='M12 7l3.3 2.4-1.3 3.9h-4l-1.3-3.9z' fill='white'/></svg>">
+  <link rel="preload" href="fonts/barlow-condensed-700-latin.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="style.css">
+  <script>
+    // Theme so früh wie möglich setzen (verhindert kurzes Aufblitzen)
+    try { const t = localStorage.getItem('soccerdle-theme'); if (t) document.documentElement.dataset.theme = t; } catch (e) {}
+  </script>
+</head>
+<body>
+  <header class="hero">
+    <div class="hero-inner">
+      <div class="logo">
+        <div class="logo-mark"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10" fill="#1f7a45"/><path d="M12 7l3.3 2.4-1.3 3.9h-4l-1.3-3.9z" fill="#fff"/><path d="M12 7V3.5M15.3 9.4l3.4-1.1M14 13.3l2.1 3.2M10 13.3l-2.1 3.2M8.7 9.4L5.3 8.3" stroke="#fff" stroke-width="1.3"/></svg></div>
+        <div><h1>Soccer<span>dle</span></h1><small id="season"></small></div>
+      </div>
+      <div class="hero-actions">
+        <button class="icon-btn" id="btn-theme" aria-label="Hell/Dunkel umschalten" title="Hell/Dunkel"><svg viewBox="0 0 24 24" id="theme-ico"></svg></button>
+        <button class="icon-btn" id="btn-stats" aria-label="Statistik" title="Statistik"><svg viewBox="0 0 24 24"><path d="M5 20V10M12 20V4M19 20v-7"/></svg></button>
+        <button class="icon-btn" id="btn-help" aria-label="Spielregeln" title="Spielregeln"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.6.3-1 .9-1 1.6V14M12 17.5v.01"/></svg></button>
+      </div>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <nav class="card games" role="tablist" aria-label="Spielmodi">
+      <button role="tab" class="game active" data-game="classic">
+        <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 10h18M9 10v10M15 10v10"/></svg><span>Klassik</span></button>
+      <button role="tab" class="game" data-game="career">
+        <svg viewBox="0 0 24 24"><circle cx="5" cy="18" r="2"/><circle cx="12" cy="8" r="2"/><circle cx="19" cy="14" r="2"/><path d="M6.4 16.6l4.2-7M13.6 9.2l4 3.6"/></svg><span>Karriere</span></button>
+      <button role="tab" class="game" data-game="grid">
+        <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 3v18M15 3v18M3 9h18M3 15h18"/></svg><span>Raster</span></button>
+      <button role="tab" class="game" data-game="mates">
+        <svg viewBox="0 0 24 24"><circle cx="8" cy="8" r="3"/><circle cx="16" cy="8" r="3"/><path d="M2 20c0-3.3 2.7-6 6-6s6 2.7 6 6M14.5 14.2A6 6 0 0 1 22 20"/></svg><span>Mitspieler</span></button>
+      <button role="tab" class="game" data-game="lineup">
+        <svg viewBox="0 0 24 24"><rect x="3" y="2" width="18" height="20" rx="2"/><path d="M3 12h18"/><circle cx="12" cy="12" r="3"/><circle cx="12" cy="6" r=".8" fill="currentColor"/><circle cx="8" cy="17" r=".8" fill="currentColor"/><circle cx="16" cy="17" r=".8" fill="currentColor"/></svg><span>Wer fehlt</span></button>
+      <button role="tab" class="game" data-game="draft">
+        <svg viewBox="0 0 24 24"><path d="M12 2l2.6 5.3 5.9.9-4.3 4.1 1 5.8L12 15.4 6.8 18.1l1-5.8L3.5 8.2l5.9-.9z"/></svg><span>Draft</span></button>
+    </nav>
+
+    <div id="classic">
+    <section class="card play">
+      <div class="sub-modes" role="tablist">
+        <button class="sub-mode active" data-sub="daily">Täglich</button>
+        <button class="sub-mode" data-sub="endless">Endlos</button>
+      </div>
+      <div class="play-top">
+        <b id="play-title"></b>
+        <span class="play-right">
+          <span id="play-count"></span>
+          <button class="btn test-btn" id="btn-test" hidden title="Nur zum Testen – zählt nicht für die Statistik">↻ Neues Rätsel (Test)</button>
+        </span>
+      </div>
+
+      <div class="endless-bar" id="endless-bar" hidden>
+        <label>Schwierigkeit
+          <select id="difficulty">
+            <option value="leicht">Leicht</option>
+            <option value="mittel">Mittel</option>
+            <option value="schwer">Schwer</option>
+          </select>
+        </label>
+        <span class="spacer"></span>
+        <button class="btn" id="btn-new">Neuer Spieler</button>
+        <button class="btn danger" id="btn-giveup">Aufgeben</button>
+      </div>
+
+      <div class="search">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
+        <input id="search" type="text" autocomplete="off" spellcheck="false" placeholder="Spielername eingeben …"
+               aria-label="Spieler suchen" role="combobox" aria-expanded="false" aria-controls="suggestions">
+        <ul id="suggestions" role="listbox" hidden></ul>
+      </div>
+      <label class="assist"><input type="checkbox" id="assist"> Hilfe-Modus: unpassende Spieler in der Suche ausgrauen</label>
+
+      <div class="hints" id="hints"></div>
+    </section>
+
+    <section id="board" aria-live="polite"></section>
+
+    <div class="legend">
+      <span><i class="hit"></i>richtig</span>
+      <span><i class="near"></i>knapp / teilweise</span>
+      <span><i class="miss"></i>falsch</span>
+    </div>
+    </div><!-- /#classic -->
+
+    <!-- Karriere, Raster, Mitspieler, Wer fehlt: werden von modes.js hier aufgebaut -->
+    <div id="other-mode" hidden></div>
+  </main>
+
+  <footer>
+    Daten: <a href="https://www.wikipedia.org" target="_blank" rel="noopener">Wikipedia</a> (CC BY-SA),
+    <a href="https://www.wikidata.org" target="_blank" rel="noopener">Wikidata</a>,
+    <a href="https://github.com/dcaribou/transfermarkt-datasets" target="_blank" rel="noopener">transfermarkt-datasets</a>
+    · Flaggen: <a href="https://github.com/lipis/flag-icons" target="_blank" rel="noopener">flag-icons</a> (MIT)
+    · Stand <span id="data-date"></span>
+    <br>Inoffizielles Fanprojekt, keine Verbindung zur UEFA oder zu Vereinen.
+  </footer>
+
+  <dialog id="dlg-result" class="dialog"></dialog>
+  <dialog id="dlg-stats" class="dialog"></dialog>
+  <dialog id="dlg-help" class="dialog">
+    <h2>So funktioniert's</h2>
+    <p>Errate den gesuchten Spieler aus der Champions League. Nach jedem Tipp zeigen die Kacheln, wie nah du dran bist.</p>
+    <div class="legend left">
+      <span><i class="hit"></i>richtig</span><span><i class="near"></i>knapp / teilweise</span><span><i class="miss"></i>falsch</span>
+    </div>
+    <ul class="rules">
+      <li><b>Liga</b> – Top-5-Ligen mit Namen, alle anderen als „Andere“. Bei „Andere“ heißt Grün: Der Gesuchte spielt auch außerhalb der Top 5 – ob in derselben Liga, wird nicht verraten.</li>
+      <li><b>Nation</b> – Nationalteam. Orange: gleicher Kontinentalverband.</li>
+      <li><b>Position</b> – Tor links, Angriff rechts. Orange: teilweise gleich (z. B. Abwehr + Mittelfeld).</li>
+      <li><b>Alter · Größe · Nr.</b> – Der Pfeil zeigt, ob der Gesuchte älter/größer/höher ↑ oder jünger/kleiner/niedriger ↓ ist. Orange: knapp daneben (±2 Jahre, ±3 cm, ±3 Nummern).</li>
+      <li><b>Fuß</b> – Orange: einer der beiden ist beidfüßig.</li>
+    </ul>
+    <p>Nach 4, 7 und 10 Fehlversuchen werden Hinweise freigeschaltet.</p>
+    <form method="dialog"><button class="primary">Los geht's</button></form>
+  </dialog>
+
+  <script src="data/players.js"></script>
+  <script src="data/history.js"></script>
+  <script src="data/lineups.js"></script>
+  <script src="app.js"></script>
+  <script src="modes.js"></script>
+  <script src="draft.js"></script>
+</body>
+</html>
