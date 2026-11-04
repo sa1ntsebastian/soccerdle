@@ -1,0 +1,32 @@
+# Veröffentlicht den Ordner web/ (das Spiel) auf GitHub Pages – automatisch bei jedem Push auf main.
+# Einmalig nötig: Repo-Einstellungen -> Pages -> Source: "GitHub Actions".
+name: Spiel auf GitHub Pages veröffentlichen
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:   # manuell startbar (Actions-Tab -> "Run workflow")
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: web
+      - id: deployment
+        uses: actions/deploy-pages@v4

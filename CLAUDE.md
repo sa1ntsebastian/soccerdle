@@ -90,7 +90,8 @@ Reihenfolge:
 ### Allgemein / Launch
 - Hilfe-Dialog („?“) erklärt bisher nur Klassik → Texte für alle Modi.
 - Tagesrätsel: feste, vorab erzeugte Liste (keine Wiederholungen) statt Hash-Zufall.
-- Impressum + Datenschutzerklärung (Pflicht AT/DE), `CONFIG.testMode = false`.
+- Impressum + Datenschutzerklärung (Pflicht AT/DE), `CONFIG.testMode = false`, `<meta name="robots" content="noindex">` in index.html entfernen.
+- Testversion läuft über GitHub Pages (`.github/workflows/pages.yml` veröffentlicht `web/` bei jedem Push auf main; Repo dafür öffentlich).
 - Test auf echtem Handy.
 - Datenqualität Wikidata (fehlende Jahre, doppelte Stationen, Leihen in Kadern).
 - Ideen-Speicher: Stadion-Umriss (OpenStreetMap), Zitat-Modus, Trikot-Modus (Farben/Muster statt Wappen), legendäre Tore als Passstafette (StatsBomb Open Data, Lizenz prüfen).
